@@ -1,4 +1,4 @@
-# expo-heroui-starter
+# expo-heroui-native-admob-starter
 
 > A **production-ready Expo starter template** with HeroUI Native components, dark/light mode, a one-line accent color system, bottom tab navigation, a polished onboarding flow, and optional Google AdMob integration.
 
@@ -11,28 +11,14 @@
 
 ---
 
-## Screenshots
-
-> _Run the app and add your own screenshots here._
-
-| Components | Explore | Profile | Settings |
-|:---:|:---:|:---:|:---:|
-| `[ screenshot ]` | `[ screenshot ]` | `[ screenshot ]` | `[ screenshot ]` |
-
-| Light Mode | Dark Mode | Onboarding |
-|:---:|:---:|:---:|
-| `[ screenshot ]` | `[ screenshot ]` | `[ screenshot ]` |
-
----
-
 ## Features
 
 ### Core
 - **Expo SDK 53** with file-based routing via `expo-router` v4
-- **HeroUI Native** — complete component library: Button, Card, Input, Switch, Progress, Avatar, Chip, Chip, Modal, Select, Textarea, RadioGroup, CheckboxGroup, Skeleton, Spinner, Divider, Badge, and more
+- **HeroUI Native** — component library: Button, Card, Input, Switch, Avatar, Chip, Dialog, Select, TextArea, RadioGroup, ControlField, Skeleton, Spinner, Separator, and more
 - **Dark & Light mode** — system-aware, toggle persisted to device, zero flash on launch
 - **One-line accent color** — change `ACCENT_COLOR` in one file; both modes update across the entire app
-- **NativeWind v4** — Tailwind CSS in React Native, tree-shakeable at build time
+- **Uniwind + Tailwind CSS v4** — utility-first styling for React Native via `className` props
 - **TypeScript strict mode** throughout with `@/` path aliases
 
 ### Screens & Navigation
@@ -63,8 +49,8 @@
 ### 1. Clone
 
 ```bash
-git clone https://github.com/yourusername/expo-heroui-starter.git
-cd expo-heroui-starter
+git clone https://github.com/acalise/expo-heroui-native-admob-starter.git
+cd expo-heroui-native-admob-starter
 ```
 
 ### 2. Install dependencies
@@ -101,19 +87,19 @@ Open `constants/theme.ts` and update the single `ACCENT_COLOR` value:
 
 ```ts
 // constants/theme.ts
-export const ACCENT_COLOR = '#8b5cf6'; // 👈 change this — purple, for example
+export const ACCENT_COLOR = '#8b5cf6'; // change this — purple, for example
 ```
 
 Then keep it in sync in `tailwind.config.js`:
 
 ```js
 // tailwind.config.js
-const ACCENT = '#8b5cf6'; // 👈 match constants/theme.ts
+const ACCENT = '#8b5cf6'; // match constants/theme.ts
 ```
 
-Both light and dark surfaces, `className`-based NativeWind components, and JS `StyleSheet` components will pick up the new color immediately.
+Both light and dark surfaces, `className`-based components, and JS `StyleSheet` components will pick up the new color immediately.
 
-> **Why two files?** NativeWind resolves Tailwind classes at build time while the theme context runs at runtime. A future build plugin can unify them.
+> **Why two files?** Tailwind resolves classes at build time while the theme context runs at runtime. A future build plugin can unify them.
 
 ### Switch the default color mode
 
@@ -226,7 +212,7 @@ await showInterstitial();
 ## Folder Structure
 
 ```
-expo-heroui-starter/
+expo-heroui-native-admob-starter/
 ├── app/                            # expo-router screens
 │   ├── _layout.tsx                 # Root layout — ThemeProvider + HeroUIProvider
 │   ├── +not-found.tsx              # 404 screen
@@ -243,20 +229,20 @@ expo-heroui-starter/
 │       └── step-three.tsx          # Step 3 — All set
 │
 ├── components/
-│   ├── BannerAd.tsx                # ★ AdMob banner (optional, no-op when disabled)
+│   ├── BannerAd.tsx                # AdMob banner (optional, no-op when disabled)
 │   ├── OnboardingDots.tsx          # Animated step indicator
 │   ├── ScreenHeader.tsx            # Consistent in-screen header
 │   ├── SectionLabel.tsx            # Uppercase section divider
 │   └── TabIcons.tsx                # Custom SVG icons for tab bar
 │
 ├── constants/
-│   └── theme.ts                    # ← ACCENT_COLOR lives here
+│   └── theme.ts                    # ACCENT_COLOR lives here
 │
 ├── context/
 │   └── ThemeContext.tsx            # Theme provider + useTheme() hook
 │
 ├── lib/
-│   ├── ads.ts                      # ★ AdMob helpers + ADS_ENABLED flag (optional)
+│   ├── ads.ts                      # AdMob helpers + ADS_ENABLED flag (optional)
 │   ├── haptics.ts                  # Semantic haptic feedback
 │   ├── notifications.ts            # Local notifications helper
 │   └── storage.ts                  # Typed AsyncStorage wrapper
@@ -264,10 +250,11 @@ expo-heroui-starter/
 ├── docs/
 │   └── widget-guide.md             # iOS widget integration walkthrough
 │
-├── global.css                      # NativeWind base styles
+├── global.css                      # Uniwind + HeroUI Native theme imports
+├── theme-base.css                  # Tailwind v4 theme variables + variants
 ├── tailwind.config.js              # Tailwind config (accent color here too)
 ├── babel.config.js
-├── metro.config.js
+├── metro.config.js                 # Uniwind metro transformer
 ├── app.json                        # Expo config (AdMob plugin included)
 ├── tsconfig.json                   # TypeScript (strict, @/ paths)
 ├── .env.example                    # Environment variable template
@@ -337,7 +324,7 @@ npx expo run:android  # requires Android Studio
 | Framework | [Expo](https://expo.dev) SDK 53 |
 | Navigation | [expo-router](https://expo.github.io/router) v4 |
 | UI Components | [heroui-native](https://heroui.com/docs/native/getting-started) |
-| Styling | [NativeWind](https://www.nativewind.dev) v4 + Tailwind CSS |
+| Styling | [Uniwind](https://docs.uniwind.dev) + Tailwind CSS v4 |
 | Animations | [react-native-reanimated](https://docs.swmansion.com/react-native-reanimated/) |
 | Gestures | [react-native-gesture-handler](https://docs.swmansion.com/react-native-gesture-handler/) |
 | Storage | [@react-native-async-storage/async-storage](https://react-native-async-storage.github.io/async-storage/) |
@@ -364,10 +351,5 @@ Please keep PRs focused and include documentation updates for any new features o
 
 ## License
 
-MIT © expo-heroui-starter contributors. See [LICENSE](./LICENSE).
+MIT © expo-heroui-native-admob-starter contributors. See [LICENSE](./LICENSE).
 
----
-
-<p align="center">
-  Built with ❤️ using <a href="https://expo.dev">Expo</a> and <a href="https://heroui.com">HeroUI</a>
-</p>
