@@ -81,54 +81,10 @@ Scan the QR code with [Expo Go](https://expo.dev/client) (iOS / Android), or pre
 
 ## Customization
 
-### Change the accent color
-
-Open `constants/theme.ts` and update the single `ACCENT_COLOR` value:
-
-```ts
-// constants/theme.ts
-export const ACCENT_COLOR = '#8b5cf6'; // change this — purple, for example
-```
-
-Then keep it in sync in `tailwind.config.js`:
-
-```js
-// tailwind.config.js
-const ACCENT = '#8b5cf6'; // match constants/theme.ts
-```
-
-Both light and dark surfaces, `className`-based components, and JS `StyleSheet` components will pick up the new color immediately.
-
-> **Why two files?** Tailwind resolves classes at build time while the theme context runs at runtime. A future build plugin can unify them.
-
-### Switch the default color mode
-
-In `context/ThemeContext.tsx`, change the fallback:
-
-```ts
-// Always start in dark mode instead of following the system preference
-const [colorMode, setColorModeState] = useState<ColorMode>('dark');
-```
-
-### Add or remove tabs
-
-Edit `app/(tabs)/_layout.tsx`. Each `<Tabs.Screen>` entry maps to a file in `app/(tabs)/`.
-
-### Skip onboarding after first launch
-
-Check the storage flag in your root layout:
-
-```ts
-// app/_layout.tsx
-import { storage } from '@/lib/storage';
-import { ONBOARDING_COMPLETE_KEY } from '@/app/onboarding/step-three';
-
-useEffect(() => {
-  storage.get<boolean>(ONBOARDING_COMPLETE_KEY).then((done) => {
-    if (!done) router.replace('/onboarding');
-  });
-}, []);
-```
+- **Accent color** — update `ACCENT_COLOR` in `constants/theme.ts` and the matching `ACCENT` in `tailwind.config.js`
+- **Default color mode** — change the fallback in `context/ThemeContext.tsx`
+- **Add/remove tabs** — edit `app/(tabs)/_layout.tsx` and add a matching file in `app/(tabs)/`
+- **Skip onboarding** — check the `onboarding:complete` storage flag in your root layout and redirect accordingly
 
 ---
 
