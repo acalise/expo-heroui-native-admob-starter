@@ -1,0 +1,12 @@
+/* ─────────────────────────────────────────────────────────────────────────────
+   global.css — Tailwind v4 / Uniwind / HeroUI Native
+   Imported once in app/_layout.tsx
+   ───────────────────────────────────────────────────────────────────────────── */
+
+@import 'tailwindcss';
+@import 'uniwind';
+
+@import 'heroui-native/styles';
+
+/* Tell Tailwind to scan HeroUI Native's component classes */
+@source './node_modules/heroui-native/lib';

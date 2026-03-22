@@ -1,0 +1,56 @@
+/* Base theme variables required by Tailwind v4 / Uniwind */
+@theme {
+  --spacing: 0.25rem;
+}
+
+/* Platform variants */
+@custom-variant ios (@media ios);
+@custom-variant android (@media android);
+@custom-variant web (html &);
+@custom-variant native (@media native);
+@custom-variant tv (@media tv);
+@custom-variant android-tv (@media android-tv);
+@custom-variant apple-tv (@media apple-tv);
+
+/* Light/dark color scheme variants */
+@custom-variant light {
+  &:where(.light, .light *) {
+    @slot;
+  }
+  @media (prefers-color-scheme: light) {
+    &:not(:where(.light, .light *, .dark, .dark *)) {
+      @slot;
+    }
+  }
+}
+
+@custom-variant dark {
+  &:where(.dark, .dark *) {
+    @slot;
+  }
+  @media (prefers-color-scheme: dark) {
+    &:not(:where(.light, .light *, .dark, .dark *)) {
+      @slot;
+    }
+  }
+}
+
+@custom-variant disabled {
+  &:disabled {
+    @slot;
+  }
+  &[aria-disabled="true"] {
+    @slot;
+  }
+  &[readonly] {
+    @slot;
+  }
+}
+
+@utility border-continuous {
+  border-curve: continuous;
+}
+
+@utility border-circular {
+  border-curve: circular;
+}
