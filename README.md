@@ -4,8 +4,6 @@
 
 **Clone it. Change the accent color. Ship.**
 
-**[→ Preview & docs](https://acalise.github.io/expo-heroui-starter)**
-
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
 [![Expo SDK](https://img.shields.io/badge/Expo-SDK%2053-000020?logo=expo)](https://expo.dev)
 [![TypeScript](https://img.shields.io/badge/TypeScript-strict-blue?logo=typescript)](https://www.typescriptlang.org)
