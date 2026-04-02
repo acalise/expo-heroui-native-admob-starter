@@ -1,6 +1,29 @@
 {
   "name": "expo-heroui-starter",
   "version": "1.0.0",
+  "description": "Production-ready Expo starter template with HeroUI Native, dark/light mode, one-line accent color system, tab navigation, onboarding flow, and optional Google AdMob",
+  "author": "acalise",
+  "license": "MIT",
+  "homepage": "https://github.com/acalise/expo-heroui-native-admob-starter",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/acalise/expo-heroui-native-admob-starter.git"
+  },
+  "bugs": {
+    "url": "https://github.com/acalise/expo-heroui-native-admob-starter/issues"
+  },
+  "keywords": [
+    "expo",
+    "react-native",
+    "heroui",
+    "starter-template",
+    "typescript",
+    "tailwindcss",
+    "dark-mode",
+    "admob",
+    "onboarding",
+    "nativewind"
+  ],
   "main": "expo-router/entry",
   "scripts": {
     "start": "expo start",
