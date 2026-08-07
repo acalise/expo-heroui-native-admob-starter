@@ -27,51 +27,32 @@ async function safe(fn: () => Promise<void>): Promise<void> {
   try {
     await fn();
   } catch {
-    // Haptic failure is never fatal — swallow silently
+    // Haptic failure is never fatal, swallow silently
   }
 }
 
 export const haptics = {
-  /** Subtle — for micro-interactions, toggles, swipes */
-  light: () =>
-    safe(() =>
-      ExpoHaptics.impactAsync(ExpoHaptics.ImpactFeedbackStyle.Light),
-    ),
+  /** Subtle, for micro-interactions, toggles, swipes */
+  light: () => safe(() => ExpoHaptics.impactAsync(ExpoHaptics.ImpactFeedbackStyle.Light)),
 
-  /** Standard — for most button presses */
-  medium: () =>
-    safe(() =>
-      ExpoHaptics.impactAsync(ExpoHaptics.ImpactFeedbackStyle.Medium),
-    ),
+  /** Standard, for most button presses */
+  medium: () => safe(() => ExpoHaptics.impactAsync(ExpoHaptics.ImpactFeedbackStyle.Medium)),
 
-  /** Strong — for important confirmations, long-press activation */
-  heavy: () =>
-    safe(() =>
-      ExpoHaptics.impactAsync(ExpoHaptics.ImpactFeedbackStyle.Heavy),
-    ),
+  /** Strong, for important confirmations, long-press activation */
+  heavy: () => safe(() => ExpoHaptics.impactAsync(ExpoHaptics.ImpactFeedbackStyle.Heavy)),
 
-  /** Positive feedback — task completed, save successful */
+  /** Positive feedback, task completed, save successful */
   success: () =>
-    safe(() =>
-      ExpoHaptics.notificationAsync(
-        ExpoHaptics.NotificationFeedbackType.Success,
-      ),
-    ),
+    safe(() => ExpoHaptics.notificationAsync(ExpoHaptics.NotificationFeedbackType.Success)),
 
-  /** Caution — non-critical warnings */
+  /** Caution, non-critical warnings */
   warning: () =>
-    safe(() =>
-      ExpoHaptics.notificationAsync(
-        ExpoHaptics.NotificationFeedbackType.Warning,
-      ),
-    ),
+    safe(() => ExpoHaptics.notificationAsync(ExpoHaptics.NotificationFeedbackType.Warning)),
 
-  /** Error — destructive action, validation failure */
+  /** Error, destructive action, validation failure */
   error: () =>
-    safe(() =>
-      ExpoHaptics.notificationAsync(ExpoHaptics.NotificationFeedbackType.Error),
-    ),
+    safe(() => ExpoHaptics.notificationAsync(ExpoHaptics.NotificationFeedbackType.Error)),
 
-  /** Selection feedback — picker/segmented control changed */
+  /** Selection feedback, picker/segmented control changed */
   select: () => safe(() => ExpoHaptics.selectionAsync()),
 };

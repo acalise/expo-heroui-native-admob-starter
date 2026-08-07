@@ -1,311 +1,227 @@
 # expo-heroui-native-admob-starter
 
-> A **production-ready Expo starter template** with HeroUI Native components, dark/light mode, a one-line accent color system, bottom tab navigation, a polished onboarding flow, and optional Google AdMob integration.
+> An Expo starter with the boring, load-bearing parts already done: theming that doesn't drift, a paywall that passes App Review, subscriptions, attribution, analytics, and ads. **Every integration is optional and inert until you add a key.**
 
-**Clone it. Change the accent color. Ship.**
+Clone it, run it, change the accent color, ship.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
-[![Expo SDK](https://img.shields.io/badge/Expo-SDK%2053-000020?logo=expo)](https://expo.dev)
+[![Expo SDK](https://img.shields.io/badge/Expo-SDK%2057-000020?logo=expo)](https://expo.dev)
+[![React Native](https://img.shields.io/badge/React%20Native-0.86-61dafb?logo=react)](https://reactnative.dev)
 [![TypeScript](https://img.shields.io/badge/TypeScript-strict-blue?logo=typescript)](https://www.typescriptlang.org)
-[![HeroUI Native](https://img.shields.io/badge/HeroUI-Native-blueviolet)](https://heroui.com/docs/native/getting-started)
 
 ---
 
-## Features
+## Why this exists
 
-### Core
-- **Expo SDK 53** with file-based routing via `expo-router` v4
-- **HeroUI Native** — component library: Button, Card, Input, Switch, Avatar, Chip, Dialog, Select, TextArea, RadioGroup, ControlField, Skeleton, Spinner, Separator, and more
-- **Dark & Light mode** — system-aware, toggle persisted to device, zero flash on launch
-- **One-line accent color** — change `ACCENT_COLOR` in one file; both modes update across the entire app
-- **Uniwind + Tailwind CSS v4** — utility-first styling for React Native via `className` props
-- **TypeScript strict mode** throughout with `@/` path aliases
+Most starters give you navigation, a theme toggle and a component showcase, then stop exactly where the tedious work begins. The parts that actually take a week and are easy to get subtly wrong are:
 
-### Screens & Navigation
-- **Bottom tab navigation** — 4 pre-configured tabs with custom SVG icons (no icon font dependency)
-- **Component showcase** — two full screens demonstrating every HeroUI Native component, ready to reference or delete
-- **Profile screen** — polished real-world layout example with avatar, stats, achievements, and activity bars
-- **Settings screen** — dark mode toggle, notification time picker, accent color preview, ads demo
+- a **paywall** that satisfies the four things App Review checks for,
+- **subscription state** that survives reinstalls, cold starts and offline launches,
+- **attribution** wired so ad spend can be judged against revenue rather than installs,
+- **analytics** that answers _where people give up_,
+- and a **theme** that doesn't drift out of sync the first time you change a color.
 
-### Onboarding
-- **3-step onboarding flow** — welcome screen, feature highlights + permission opt-ins, all-set confirmation
-- **Animated step indicator** — spring-animated dots using `react-native-reanimated`
-- **Storage gate** — persist completion flag and skip on subsequent launches
+Those are here, working, with the reasoning written down in the files themselves. So is a [launch checklist](./docs/launch-checklist.md) of the dashboard settings that silently break attribution, none of which live in code, and all of which cost real money to discover late.
 
-### Utilities
-- **`lib/storage.ts`** — typed AsyncStorage wrapper (`get`, `set`, `remove`, `has`, `keys`, `clear`)
-- **`lib/haptics.ts`** — semantic haptic feedback (`light`, `medium`, `heavy`, `success`, `warning`, `error`, `select`)
-- **`lib/notifications.ts`** — local notifications helper (daily reminders, one-off, permission handling)
-- **`context/ThemeContext.tsx`** — theme provider with `useTheme()` hook, persistence, system fallback
-
-### Optional Modules
-- **Google AdMob** — pre-configured `BannerAd` component + `showInterstitial()` helper; disabled by default, enabled with a single env variable
-- **iOS Widget guide** — step-by-step walkthrough in `docs/widget-guide.md`
+**Everything is optional.** With an empty `.env`, purchases grant a local dev unlock, analytics and attribution no-op, ads stay off, and the app runs end to end. Add a key to switch a service on. No feature flags to hunt for, no code to uncomment.
 
 ---
 
-## Quick Start
-
-### 1. Clone
+## Quick start
 
 ```bash
-git clone https://github.com/acalise/expo-heroui-native-admob-starter.git
-cd expo-heroui-native-admob-starter
-```
-
-### 2. Install dependencies
-
-```bash
+git clone https://github.com/acalise/expo-heroui-native-admob-starter.git my-app
+cd my-app
 npm install
-# or
-pnpm install
-```
-
-### 3. Set up environment
-
-```bash
 cp .env.example .env
+
+npx expo run:ios       # or: npx expo run:android
 ```
 
-### 4. Start the dev server
+Requires Xcode (iOS) or Android Studio. **A native build is required**: RevenueCat, AppsFlyer and AdMob are native modules that don't exist in Expo Go.
 
-```bash
-npx expo start
-```
-
-Scan the QR code with [Expo Go](https://expo.dev/client) (iOS / Android), or press `i` / `a` to open in a simulator.
-
-> **First run on iOS Simulator?** Run `npx expo run:ios` (requires Xcode).
+You can still use Expo Go for UI work (`npm run start:go`): the whole interface runs, with those three inert. See [`lib/native.ts`](./lib/native.ts) for how that's done.
 
 ---
 
-## Customization
+## What's in the box
 
-- **Accent color** — update `ACCENT_COLOR` in `constants/theme.ts` and the matching `ACCENT` in `tailwind.config.js`
-- **Default color mode** — change the fallback in `context/ThemeContext.tsx`
-- **Add/remove tabs** — edit `app/(tabs)/_layout.tsx` and add a matching file in `app/(tabs)/`
-- **Skip onboarding** — check the `onboarding:complete` storage flag in your root layout and redirect accordingly
+### Foundation
 
----
+- **Expo SDK 57** · React Native 0.86 · React 19.2 · New Architecture
+- **expo-router** file-based routing with typed routes
+- **HeroUI Native 1.0** with 40+ components: Button, Card, Input, Select, Switch, Slider, Tabs, Accordion, Dialog, BottomSheet, Menu, Popover, Toast, Skeleton, …
+- **Uniwind + Tailwind v4**: `className` styling for React Native
+- **TypeScript strict** with `@/` path aliases, ESLint and Prettier configured
 
-## Optional: Google AdMob
+### Theming that stays in sync
 
-This starter ships with AdMob pre-wired but **disabled by default**. Google's official test ad unit IDs are pre-configured, so you can enable and test ads immediately without an AdMob account.
+- **One file, one color.** Change `--accent` in [`theme.css`](./theme.css) and everything updates: components, tab bar, status bar, both color schemes.
+- No duplicated palette object. The few places that need a JS color read the same CSS variables at runtime.
+- **Light / dark / system** as three real choices, persisted, with no flash on launch.
 
-### Enable ads
+### Monetisation
 
-```bash
-# .env
-EXPO_PUBLIC_ADS_ENABLED=true
-```
+- **RevenueCat**: entitlement-based subscriptions, cached for offline, cross-device sync, restore, dev overrides
+- **A real paywall** (`app/paywall.tsx`) with the four App Review requirements handled and explained
+- **Google AdMob**: banner / interstitial / rewarded, automatically suppressed for subscribers
 
-Then build natively (ads require a native build — they will not work in Expo Go):
+### Growth
 
-```bash
-npx expo run:ios   # or: eas build --platform ios
-npx expo run:android
-```
+- **PostHog**: product analytics, one `track()` call, funnel-ready event naming
+- **AppsFlyer**: ad attribution wired to avoid the three silent double-counting and dropped-event traps
+- **153 SKAdNetwork IDs** pre-loaded (you cannot add these retroactively without a new submission)
+- **App Tracking Transparency**, off by default, with the trade-off documented
+- **Rating prompts** timed against Apple's invisible three-per-year cap
 
-### Replace test IDs with your real ad unit IDs
+### Screens
 
-Edit `lib/ads.ts` and swap in the IDs from your [AdMob dashboard](https://admob.google.com):
-
-```ts
-// lib/ads.ts
-export const AD_UNIT_IDS = {
-  banner: Platform.select({
-    ios: 'ca-app-pub-XXXXXXXXXXXXXXXX/XXXXXXXXXX',     // your real iOS banner ID
-    android: 'ca-app-pub-XXXXXXXXXXXXXXXX/XXXXXXXXXX', // your real Android banner ID
-  }),
-  interstitial: Platform.select({
-    ios: 'ca-app-pub-XXXXXXXXXXXXXXXX/XXXXXXXXXX',
-    android: 'ca-app-pub-XXXXXXXXXXXXXXXX/XXXXXXXXXX',
-  }),
-};
-```
-
-Also update `app.json` with your real app IDs:
-
-```json
-["react-native-google-mobile-ads", {
-  "androidAppId": "ca-app-pub-XXXXXXXXXXXXXXXX~XXXXXXXXXX",
-  "iosAppId": "ca-app-pub-XXXXXXXXXXXXXXXX~XXXXXXXXXX"
-}]
-```
-
-### Use the BannerAd component
-
-```tsx
-import { BannerAd } from '@/components/BannerAd';
-
-// Drop anywhere in a screen — renders nothing when ads are disabled
-<BannerAd />
-<BannerAd marginHorizontal={16} marginVertical={12} />
-```
-
-### Show an interstitial ad
-
-```ts
-import { loadInterstitial, showInterstitial } from '@/lib/ads';
-
-// Pre-load early (e.g. on app launch)
-await loadInterstitial();
-
-// Show when ready (e.g. on button press, between levels, etc.)
-await showInterstitial();
-```
-
-### Remove ads entirely
-
-1. Delete `lib/ads.ts` and `components/BannerAd.tsx`
-2. Remove `<BannerAd />` from `app/(tabs)/index.tsx`
-3. Remove the Ads section from `app/(tabs)/settings.tsx`
-4. Remove `react-native-google-mobile-ads` from `package.json`
-5. Remove the plugin entry from `app.json`
+- 3-step **onboarding** with per-step funnel events and a properly-placed permission ask
+- 4 tabs: component showcase · integration status dashboard · profile layout · settings
+- A **Growth tab** that tells you, live, which integrations are actually wired in _this_ build, because the failure mode for all of them is silence
 
 ---
 
-## Folder Structure
+## Documentation
+
+|                                                    |                                                                                             |
+| -------------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| [**Theming**](./docs/theming.md)                   | How one CSS file drives everything; adding brand themes and fonts                           |
+| [**RevenueCat**](./docs/revenuecat.md)             | Why not raw StoreKit; setup; the two calls that fail silently; paywall rules                |
+| [**AppsFlyer**](./docs/appsflyer.md)               | Whether you need an MMP at all; SKAdNetwork; the double-counting traps                      |
+| [**PostHog**](./docs/posthog.md)                   | Event naming that survives six months; replay; feature flags                                |
+| [**AdMob**](./docs/admob.md)                       | Whether ads are worth it; placement; consent; removal                                       |
+| [**Launch checklist**](./docs/launch-checklist.md) | ⚠️ The dashboard settings that silently break attribution. Read before your first campaign. |
+| [**iOS widgets**](./docs/widget-guide.md)          | Adding a home-screen widget                                                                 |
+
+Every `lib/` file also carries a header explaining _why_ it's built the way it is. Those headers are the real documentation: the docs above are the setup steps.
+
+---
+
+## Configuration
+
+Everything is driven by `.env`. See [`.env.example`](./.env.example) for the annotated list and [`constants/config.ts`](./constants/config.ts) for how it's read.
+
+| Variable                         | Turns on                                     |
+| -------------------------------- | -------------------------------------------- |
+| `EXPO_PUBLIC_REVENUECAT_IOS_KEY` | Real purchases (otherwise: local dev unlock) |
+| `EXPO_PUBLIC_POSTHOG_KEY`        | Product analytics                            |
+| `EXPO_PUBLIC_APPSFLYER_DEV_KEY`  | Ad attribution + the SKAN report endpoint    |
+| `EXPO_PUBLIC_ADS_ENABLED=true`   | Ads (Google's test unit IDs are pre-wired)   |
+| `EXPO_PUBLIC_ATT_ENABLED=true`   | Apple's tracking prompt                      |
+
+> `EXPO_PUBLIC_*` values are **inlined into the app bundle** and readable by anyone who downloads your app. Every key above is a publishable client key, which is why they can live there. Never put a RevenueCat _secret_ key or a PostHog _personal_ API key in `.env`.
+>
+> Env values are baked in at bundle time, restart with `npx expo start -c` after editing.
+
+---
+
+## Project structure
 
 ```
-expo-heroui-native-admob-starter/
-├── app/                            # expo-router screens
-│   ├── _layout.tsx                 # Root layout — ThemeProvider + HeroUIProvider
-│   ├── +not-found.tsx              # 404 screen
-│   ├── (tabs)/
-│   │   ├── _layout.tsx             # Tab navigator (4 tabs + custom SVG icons)
-│   │   ├── index.tsx               # Components showcase (tab 1)
-│   │   ├── explore.tsx             # More components (tab 2)
-│   │   ├── profile.tsx             # Profile layout demo (tab 3)
-│   │   └── settings.tsx            # Dark mode + notifications + ads demo (tab 4)
-│   └── onboarding/
-│       ├── _layout.tsx
-│       ├── index.tsx               # Step 1 — Welcome
-│       ├── step-two.tsx            # Step 2 — Features + notification opt-in
-│       └── step-three.tsx          # Step 3 — All set
+├── app/                      # expo-router screens
+│   ├── _layout.tsx           # providers + SDK bootstrap (the ordering matters, see the file)
+│   ├── onboarding.tsx        # 3-step paged flow with funnel events
+│   ├── paywall.tsx           # subscription screen, App Review compliant
+│   └── (tabs)/               # components · growth · profile · settings
 │
 ├── components/
-│   ├── BannerAd.tsx                # AdMob banner (optional, no-op when disabled)
-│   ├── OnboardingDots.tsx          # Animated step indicator
-│   ├── ScreenHeader.tsx            # Consistent in-screen header
-│   ├── SectionLabel.tsx            # Uppercase section divider
-│   └── TabIcons.tsx                # Custom SVG icons for tab bar
+│   ├── AppText.tsx           # Text + a font-scaling cap
+│   ├── BannerAd.tsx          # collapses to nothing when ads are off or user pays
+│   ├── Icons.tsx             # inline SVG, className-aware, no icon font
+│   ├── OnboardingDots.tsx
+│   ├── Screen.tsx            # safe-area container (className can't reach SafeAreaView)
+│   ├── ScreenHeader.tsx
+│   └── SectionLabel.tsx
 │
 ├── constants/
-│   └── theme.ts                    # ACCENT_COLOR lives here
+│   ├── config.ts             # every env var, read once, typed
+│   ├── skadnetwork.ts        # 153 SKAdNetwork IDs + why they're all there
+│   └── skadnetwork-ids.json
 │
-├── context/
-│   └── ThemeContext.tsx            # Theme provider + useTheme() hook
+├── context/ThemeContext.tsx  # light/dark/system, persisted
+├── hooks/useAppTheme.ts      # CSS variables → JS colors
 │
 ├── lib/
-│   ├── ads.ts                      # AdMob helpers + ADS_ENABLED flag (optional)
-│   ├── haptics.ts                  # Semantic haptic feedback
-│   ├── notifications.ts            # Local notifications helper
-│   └── storage.ts                  # Typed AsyncStorage wrapper
+│   ├── ads.ts                # AdMob, gated on subscription
+│   ├── analytics.ts          # PostHog + AppsFlyer behind one track()
+│   ├── subscription.ts       # RevenueCat entitlements
+│   ├── native.ts             # load native modules without crashing Expo Go
+│   ├── tracking.ts           # ATT
+│   ├── review.ts             # rating prompts, timed properly
+│   ├── notifications.ts      # local notifications
+│   ├── haptics.ts            # semantic haptic feedback
+│   └── storage.ts            # typed AsyncStorage
 │
-├── docs/
-│   └── widget-guide.md             # iOS widget integration walkthrough
-│
-├── global.css                      # Uniwind + HeroUI Native theme imports
-├── theme-base.css                  # Tailwind v4 theme variables + variants
-├── tailwind.config.js              # Tailwind config (accent color here too)
-├── babel.config.js
-├── metro.config.js                 # Uniwind metro transformer
-├── app.json                        # Expo config (AdMob plugin included)
-├── tsconfig.json                   # TypeScript (strict, @/ paths)
-├── .env.example                    # Environment variable template
-└── package.json
+├── theme.css                 # ← the file you edit to rebrand
+├── global.css                # CSS entry point
+├── app.json                  # static Expo config
+├── app.config.ts             # dynamic config: SKAdNetwork, conditional plugins
+└── scripts/                  # postinstall workaround (see Troubleshooting)
 ```
 
 ---
 
-## Adding New Screens
+## Common tasks
 
-1. Create a file in `app/` (or a subfolder for grouping).
-2. Export a default React component.
-3. Navigate to it with `useRouter().push('/your-screen')` or a `<Link>`.
+**Rebrand.** Change `--accent` and `--accent-foreground` in `theme.css`. That's it. ([details](./docs/theming.md))
 
-For new tab screens, add a `<Tabs.Screen>` entry in `app/(tabs)/_layout.tsx` and a matching file in `app/(tabs)/`.
+**Add a tab.** Create `app/(tabs)/thing.tsx`, add a `<Tabs.Screen name="thing">` in `app/(tabs)/_layout.tsx`.
+
+**Gate a feature**
+
+```tsx
+const { isPro } = useSubscription();
+if (!isPro) return <UpgradePrompt onPress={() => router.push('/paywall')} />;
+```
+
+**Track an event.** `track('thing_happened', { where: 'settings' })`. Goes to PostHog and AppsFlyer; no-ops if neither is configured.
+
+**Remove an integration.** Each doc ends with an exact removal checklist.
 
 ---
 
-## Environment Variables
+## Troubleshooting
 
-Copy `.env.example` to `.env`:
+**Build fails with `type of expression is ambiguous` in `expo-modules-jsi`**
+An upstream Expo SDK 57 incompatibility with Xcode 26.3 / Swift 6.2. Swift/C++ interop makes `abs()` ambiguous. `scripts/patch-expo-swift-interop.js` runs on `postinstall` and fixes the one line. If you cloned and skipped install scripts, run `node scripts/patch-expo-swift-interop.js`. Delete the script and its `postinstall` entry once Expo ships a fix.
 
-```bash
-cp .env.example .env
-```
+**App crashes instantly with `GADInvalidInitializationException`**
+The Google Mobile Ads SDK hard-crashes when `GADApplicationIdentifier` is missing from Info.plist, even if you never show an ad. `app.config.ts` therefore adds the AdMob plugin unconditionally. Run `npx expo prebuild --clean`. To be rid of it entirely, uninstall the package ([steps](./docs/admob.md#removing-ads-entirely)).
 
-| Variable | Default | Description |
-|---|---|---|
-| `EXPO_PUBLIC_APP_NAME` | `My App` | App display name |
-| `EXPO_PUBLIC_ADS_ENABLED` | `false` | Enable Google AdMob |
+**Env changes have no effect**: `npx expo start -c`. Values are inlined at bundle time.
 
-Variables prefixed with `EXPO_PUBLIC_` are inlined at build time and accessible via `process.env.EXPO_PUBLIC_*`.
+**A Tailwind class does nothing**: Tailwind only emits classes it sees used. For components in `node_modules`, add them to `@source` in `global.css`.
 
----
+**`className` is ignored on a component and the layout collapses**
+Uniwind teaches React Native's _core_ components (View, Text, ScrollView, Pressable) to understand `className`. It cannot do that for arbitrary third-party components, including `SafeAreaView` from `react-native-safe-area-context`. The classes are silently dropped, so `flex-1` never applies and the container shrinks to its content. Use `components/Screen.tsx`, or wrap the component with `withUniwind()`. ([why](./components/Screen.tsx))
 
-## Building for Production
-
-### EAS Build (recommended)
-
-```bash
-# Install EAS CLI
-npm install -g eas-cli
-
-# Configure your project
-eas build:configure
-
-# Build for iOS / Android
-eas build --platform ios
-eas build --platform android
-```
-
-### Local builds
-
-```bash
-npx expo run:ios      # requires Xcode
-npx expo run:android  # requires Android Studio
-```
-
-> **AdMob note:** Ads require a native build. Run `npx expo run:ios` or use EAS — Expo Go will not load the AdMob native module.
+**Native module errors in Expo Go**: expected. Use `npx expo run:ios`. ([why](./lib/native.ts))
 
 ---
 
-## Tech Stack
+## Tech stack
 
-| Layer | Library |
-|---|---|
-| Framework | [Expo](https://expo.dev) SDK 53 |
-| Navigation | [expo-router](https://expo.github.io/router) v4 |
-| UI Components | [heroui-native](https://heroui.com/docs/native/getting-started) |
-| Styling | [Uniwind](https://docs.uniwind.dev) + Tailwind CSS v4 |
-| Animations | [react-native-reanimated](https://docs.swmansion.com/react-native-reanimated/) |
-| Gestures | [react-native-gesture-handler](https://docs.swmansion.com/react-native-gesture-handler/) |
-| Storage | [@react-native-async-storage/async-storage](https://react-native-async-storage.github.io/async-storage/) |
-| Haptics | [expo-haptics](https://docs.expo.dev/versions/latest/sdk/haptics/) |
-| Notifications | [expo-notifications](https://docs.expo.dev/versions/latest/sdk/notifications/) |
-| Ads _(optional)_ | [react-native-google-mobile-ads](https://rnfirebase.io/admob/usage) |
-| Language | TypeScript (strict) |
+| Layer         | Choice                                                              |
+| ------------- | ------------------------------------------------------------------- |
+| Framework     | [Expo](https://expo.dev) SDK 57                                     |
+| Routing       | [expo-router](https://docs.expo.dev/router/introduction/)           |
+| Components    | [HeroUI Native](https://heroui.com/docs/native/getting-started)     |
+| Styling       | [Uniwind](https://docs.uniwind.dev) + Tailwind CSS v4               |
+| Animation     | [Reanimated](https://docs.swmansion.com/react-native-reanimated/) 4 |
+| Subscriptions | [RevenueCat](https://www.revenuecat.com)                            |
+| Analytics     | [PostHog](https://posthog.com)                                      |
+| Attribution   | [AppsFlyer](https://www.appsflyer.com)                              |
+| Ads           | [Google AdMob](https://admob.google.com)                            |
+| Storage       | AsyncStorage                                                        |
+| Language      | TypeScript (strict)                                                 |
 
 ---
 
 ## Contributing
 
-Contributions are welcome!
-
-1. Fork the repo
-2. Create a feature branch: `git checkout -b feat/your-feature`
-3. Commit your changes: `git commit -m 'feat: add your feature'`
-4. Push to your fork: `git push origin feat/your-feature`
-5. Open a Pull Request
-
-Please keep PRs focused and include documentation updates for any new features or options.
-
----
+Issues and PRs welcome. Please keep PRs focused, and update the relevant doc when you change behaviour: the explanations are the point of this repo, not a side effect.
 
 ## License
 
-MIT © expo-heroui-native-admob-starter contributors. See [LICENSE](./LICENSE).
-
+MIT. See [LICENSE](./LICENSE).

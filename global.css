@@ -1,12 +1,18 @@
 /* ─────────────────────────────────────────────────────────────────────────────
-   global.css — Tailwind v4 / Uniwind / HeroUI Native
-   Imported once in app/_layout.tsx
+   global.css: the single CSS entry point. Imported once, from app/_layout.tsx.
+   Metro compiles it via `withUniwindConfig(...)` in metro.config.js.
    ───────────────────────────────────────────────────────────────────────────── */
 
 @import 'tailwindcss';
 @import 'uniwind';
 
+/* HeroUI Native's base tokens + component styles. Must come before theme.css
+   so our overrides win. */
 @import 'heroui-native/styles';
 
-/* Tell Tailwind to scan HeroUI Native's component classes */
+/* Your overrides. This is the file you edit. */
+@import './theme.css';
+
+/* Tailwind only emits utilities it sees used. HeroUI's components live in
+   node_modules, so point the scanner at them or half their classes get purged. */
 @source './node_modules/heroui-native/lib';

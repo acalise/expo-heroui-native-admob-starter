@@ -1,84 +1,62 @@
 /**
- * components/BannerAd.tsx — Optional Google AdMob banner (optional module)
+ * components/BannerAd.tsx: an AdMob banner that's safe to leave in your layout.
  *
- * Renders a banner ad when ADS_ENABLED=true, otherwise renders nothing.
- * Drop this anywhere in a screen — it won't affect layout when disabled.
+ * Renders nothing at all when ads are off, when the SDK isn't linked (Expo Go),
+ * or when the user is a subscriber. Because it collapses to zero height rather
+ * than reserving space, you can drop `<BannerAd />` into a screen and forget
+ * about it: the layout is identical for paying users.
  *
  * Usage:
- *   import { BannerAd } from '@/components/BannerAd';
  *   <BannerAd />
+ *   <BannerAd size="anchored" />   // adaptive, sized to the device width
  *
- * To remove: delete this file and any <BannerAd /> usage in your screens.
+ * Removing ads entirely: see docs/admob.md.
  */
 
-import { View, StyleSheet, Platform } from 'react-native';
-import { ADS_ENABLED, AD_UNIT_IDS } from '@/lib/ads';
+import { useState } from 'react';
+import { View } from 'react-native';
 
-// BannerAdSize is only imported when ads are enabled to avoid native crashes
-// when the module is not fully linked (e.g. Expo Go without a dev build).
+import { AD_UNIT_IDS, adsAllowed } from '@/lib/ads';
+import { optionalRequire } from '@/lib/native';
+
+type AdMobModule = typeof import('react-native-google-mobile-ads');
 
 interface BannerAdProps {
-  /** Override the default banner ad unit ID */
+  /** Override the ad unit. Defaults to the banner unit in lib/ads.ts. */
   unitId?: string;
-  /** Horizontal margin around the banner (default: 0) */
-  marginHorizontal?: number;
-  /** Top/bottom margin around the banner (default: 8) */
-  marginVertical?: number;
+  /**
+   * 'fixed': the classic 320×50 banner.
+   * 'anchored', adaptive: full device width, height chosen by Google.
+   *              Higher fill and better revenue; use it unless you have a
+   *              layout reason not to.
+   */
+  size?: 'fixed' | 'anchored';
+  className?: string;
 }
 
-/**
- * AdMob banner ad component. Renders nothing when ADS_ENABLED is false
- * or when running on web.
- */
-export function BannerAd({
-  unitId,
-  marginHorizontal = 0,
-  marginVertical = 8,
-}: BannerAdProps) {
-  // No ads on web, or when disabled
-  if (!ADS_ENABLED || Platform.OS === 'web') return null;
+export function BannerAd({ unitId, size = 'anchored', className }: BannerAdProps) {
+  // A banner that fails to fill should occupy no space rather than leaving a
+  // grey gap, no-fill is normal, especially with low traffic or in some regions.
+  const [failed, setFailed] = useState(false);
 
-  // Lazy import to avoid native module errors in Expo Go
-  let BannerAdComponent: React.ComponentType<{
-    unitId: string;
-    size: string;
-    onAdFailedToLoad?: (error: Error) => void;
-  }> | null = null;
-  let bannerSize = 'BANNER';
+  if (!adsAllowed() || failed) return null;
 
-  try {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const admob = require('react-native-google-mobile-ads');
-    BannerAdComponent = admob.BannerAd;
-    bannerSize = admob.BannerAdSize.BANNER;
-  } catch {
-    return null;
-  }
+  const admob = optionalRequire<AdMobModule>('react-native-google-mobile-ads', (m) => m);
+  if (!admob) return null;
 
-  if (!BannerAdComponent) return null;
+  const { BannerAd: GoogleBanner, BannerAdSize } = admob;
 
   return (
-    <View
-      style={[
-        styles.container,
-        { marginHorizontal, marginVertical },
-      ]}
-    >
-      <BannerAdComponent
+    <View className={className ?? 'items-center py-2'}>
+      <GoogleBanner
         unitId={unitId ?? AD_UNIT_IDS.banner}
-        size={bannerSize}
-        onAdFailedToLoad={(error) => {
-          // Silently fail — ads should never crash the app
-          if (__DEV__) console.warn('[BannerAd] Failed to load:', error.message);
+        size={size === 'anchored' ? BannerAdSize.ANCHORED_ADAPTIVE_BANNER : BannerAdSize.BANNER}
+        requestOptions={{ requestNonPersonalizedAdsOnly: true }}
+        onAdFailedToLoad={(error: Error) => {
+          if (__DEV__) console.log('[BannerAd] no fill:', error.message);
+          setFailed(true);
         }}
       />
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    alignItems: 'center',
-    overflow: 'hidden',
-  },
-});

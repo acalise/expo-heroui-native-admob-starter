@@ -1,38 +1,13 @@
 /**
- * components/SectionLabel.tsx
- *
- * Small uppercase section divider label used in the component showcase.
+ * components/SectionLabel.tsx: small uppercase label above a group of rows.
  */
 
-import { Text, StyleSheet } from 'react-native';
-import { useTheme } from '@/context/ThemeContext';
+import { AppText } from './AppText';
 
-interface SectionLabelProps {
-  children: string;
-}
-
-export function SectionLabel({ children }: SectionLabelProps) {
-  const { theme } = useTheme();
+export function SectionLabel({ children }: { children: string }) {
   return (
-    <Text
-      style={[
-        styles.label,
-        { color: theme.textMuted },
-      ]}
-    >
+    <AppText className="pb-2 pl-0.5 pt-4 text-[11px] font-bold uppercase tracking-widest text-muted">
       {children}
-    </Text>
+    </AppText>
   );
 }
-
-const styles = StyleSheet.create({
-  label: {
-    fontSize: 11,
-    fontWeight: '700',
-    textTransform: 'uppercase',
-    letterSpacing: 1,
-    marginBottom: 8,
-    marginTop: 12,
-    paddingLeft: 2,
-  },
-});

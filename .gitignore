@@ -20,6 +20,12 @@ android/
 .env.*
 !.env.example
 
+# ── Generated ────────────────────────────────────────────────────────────────
+# Metro regenerates this on every start from your CSS. Committing it produces
+# a diff on every machine that runs the app.
+uniwind-types.d.ts
+expo-env.d.ts
+
 # ── Editor ────────────────────────────────────────────────────────────────────
 .vscode/
 .idea/

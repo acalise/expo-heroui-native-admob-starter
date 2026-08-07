@@ -1,45 +1,33 @@
-import { View, Text, StyleSheet } from 'react-native';
-import { Button } from 'heroui-native';
+/**
+ * app/+not-found.tsx: shown for any route that doesn't exist.
+ *
+ * Worth keeping even if you think your app has no dead links: this is also what
+ * a malformed deep link lands on, and the alternative is a blank screen with no
+ * way back.
+ */
+
 import { useRouter } from 'expo-router';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { useTheme } from '@/context/ThemeContext';
+import { View } from 'react-native';
+import { Button } from 'heroui-native';
+
+import { AppText } from '@/components/AppText';
+import { Screen } from '@/components/Screen';
 
 export default function NotFoundScreen() {
-  const { theme } = useTheme();
   const router = useRouter();
 
   return (
-    <SafeAreaView
-      style={{ flex: 1, backgroundColor: theme.background }}
-    >
-      <View style={styles.container}>
-        <Text style={[styles.code, { color: theme.accent }]}>404</Text>
-        <Text style={[styles.title, { color: theme.textPrimary }]}>
-          Screen not found
-        </Text>
-        <Text style={[styles.body, { color: theme.textSecondary }]}>
-          The route you're looking for doesn't exist.
-        </Text>
-        <Button
-          variant="primary"
-          style={{ marginTop: 24 }}
-          onPress={() => router.replace('/(tabs)')}
-        >
-          Go Home
+    <Screen>
+      <View className="flex-1 items-center justify-center gap-2 px-8">
+        <AppText className="text-7xl font-black text-accent">404</AppText>
+        <AppText className="text-2xl font-bold text-foreground">Screen not found</AppText>
+        <AppText className="pb-4 text-center text-base leading-6 text-muted">
+          That route doesn&apos;t exist. It may have moved, or the link may be wrong.
+        </AppText>
+        <Button onPress={() => router.replace('/(tabs)')}>
+          <Button.Label>Go home</Button.Label>
         </Button>
       </View>
-    </SafeAreaView>
+    </Screen>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 32,
-  },
-  code: { fontSize: 80, fontWeight: '900', lineHeight: 90 },
-  title: { fontSize: 24, fontWeight: '700', marginTop: 8 },
-  body: { fontSize: 15, textAlign: 'center', marginTop: 10, lineHeight: 24 },
-});

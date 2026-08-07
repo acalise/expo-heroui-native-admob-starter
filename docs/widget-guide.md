@@ -4,26 +4,32 @@ This guide explains how to add **iOS Home Screen Widgets** to your Expo app as a
 extension. Widgets are built with **SwiftUI** inside a native App Extension and can read shared
 data you expose from the RN side via **App Groups**.
 
-> **Note:** Widgets require an [EAS Build](https://docs.expo.dev/build/introduction/) or ejecting
-> to a bare workflow. They cannot run in Expo Go.
+> **Note:** Widgets require a native project (`npx expo prebuild`) or an
+> [EAS Build](https://docs.expo.dev/build/introduction/). They cannot run in Expo Go.
+>
+> **Before you hand-roll this:** SDK 57 ships [`expo-widgets`](https://docs.expo.dev/versions/latest/sdk/widgets/),
+> a config plugin that generates and wires the extension target for you. Reach for
+> it first. This guide covers the manual route, which is what you want when you
+> need an extension shape the plugin doesn't produce, or when you want to
+> understand what the plugin is doing on your behalf.
 
 ---
 
 ## Prerequisites
 
-| Requirement | Notes |
-|---|---|
-| Expo SDK 51+ | Needed for stable bare workflow |
-| Apple Developer Account | Required for App Groups entitlement |
-| Xcode 15+ | SwiftUI widget templates ship with Xcode |
-| EAS CLI | `npm install -g eas-cli` |
+| Requirement             | Notes                                    |
+| ----------------------- | ---------------------------------------- |
+| Expo SDK 57             | This starter's version                   |
+| Apple Developer Account | Required for App Groups entitlement      |
+| Xcode 16+               | SwiftUI widget templates ship with Xcode |
+| EAS CLI                 | `npm install -g eas-cli`                 |
 
 ---
 
 ## How Widgets Share Data with Your App
 
 Widgets cannot access your app's AsyncStorage directly. Instead, you expose data through an
-**App Group** — a shared container on disk that both the main app and the widget extension can
+**App Group**: a shared container on disk that both the main app and the widget extension can
 read and write.
 
 ```
@@ -40,7 +46,7 @@ Widget Extension (SwiftUI)
 
 ---
 
-## Step 1 — Enable App Groups in Expo
+## Step 1: Enable App Groups in Expo
 
 In `app.json`, add the entitlement for both your main target and the widget extension:
 
@@ -49,9 +55,7 @@ In `app.json`, add the entitlement for both your main target and the widget exte
   "expo": {
     "ios": {
       "entitlements": {
-        "com.apple.security.application-groups": [
-          "group.com.yourname.yourapp"
-        ]
+        "com.apple.security.application-groups": ["group.com.yourname.yourapp"]
       }
     }
   }
@@ -60,7 +64,7 @@ In `app.json`, add the entitlement for both your main target and the widget exte
 
 ---
 
-## Step 2 — Write Data from React Native
+## Step 2: Write Data from React Native
 
 Install the community library that bridges React Native → App Group:
 
@@ -84,11 +88,7 @@ export interface WidgetData {
 
 export async function updateWidgetData(data: WidgetData): Promise<void> {
   try {
-    await SharedGroupPreferences.setItem(
-      'widgetData',
-      JSON.stringify(data),
-      APP_GROUP,
-    );
+    await SharedGroupPreferences.setItem('widgetData', JSON.stringify(data), APP_GROUP);
     // Optionally reload the widget timeline immediately:
     // WidgetKit.reloadAllTimelines(); // (requires native module)
   } catch (e) {
@@ -102,7 +102,7 @@ on app foreground).
 
 ---
 
-## Step 3 — Create the Widget Extension in Xcode
+## Step 3: Create the Widget Extension in Xcode
 
 1. Open `ios/YourApp.xcworkspace` in Xcode.
 2. **File → New → Target → Widget Extension**
@@ -112,7 +112,7 @@ on app foreground).
 
 ---
 
-## Step 4 — Read Data in SwiftUI
+## Step 4: Read Data in SwiftUI
 
 ```swift
 // YourAppWidget.swift
@@ -138,25 +138,25 @@ struct Provider: TimelineProvider {
     let appGroup = "group.com.yourname.yourapp"
 
     func placeholder(in context: Context) -> SimpleEntry {
-        SimpleEntry(date: .now, data: WidgetData(title: "–", value: 0, updatedAt: ""))
+        SimpleEntry(date.now, data: WidgetData(title: "–", value: 0, updatedAt: ""))
     }
 
     func getSnapshot(in context: Context, completion: @escaping (SimpleEntry) -> Void) {
-        completion(SimpleEntry(date: .now, data: readData()))
+        completion(SimpleEntry(date.now, data: readData()))
     }
 
     func getTimeline(in context: Context, completion: @escaping (Timeline<SimpleEntry>) -> Void) {
-        let entry = SimpleEntry(date: .now, data: readData())
+        let entry = SimpleEntry(date.now, data: readData())
         // Refresh every 15 minutes
-        let nextUpdate = Calendar.current.date(byAdding: .minute, value: 15, to: .now)!
-        completion(Timeline(entries: [entry], policy: .after(nextUpdate)))
+        let nextUpdate = Calendar.current.date(byAdding.minute, value: 15, to.now)!
+        completion(Timeline(entries: [entry], policy.after(nextUpdate)))
     }
 
     private func readData() -> WidgetData {
         guard
             let defaults = UserDefaults(suiteName: appGroup),
             let json = defaults.string(forKey: "widgetData"),
-            let data = json.data(using: .utf8),
+            let data = json.data(using.utf8),
             let decoded = try? JSONDecoder().decode(WidgetData.self, from: data)
         else {
             return WidgetData(title: "No data", value: 0, updatedAt: "")
@@ -170,15 +170,15 @@ struct YourAppWidgetEntryView: View {
     var entry: Provider.Entry
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 4) {
+        VStack(alignment.leading, spacing: 4) {
             Text(entry.data.title)
                 .font(.headline)
             Text("\(entry.data.value)")
-                .font(.system(size: 40, weight: .bold))
+                .font(.system(size: 40, weight.bold))
                 .foregroundColor(.blue)
         }
         .padding()
-        .containerBackground(.background, for: .widget)
+        .containerBackground(.background, for.widget)
     }
 }
 
@@ -193,14 +193,14 @@ struct YourAppWidget: Widget {
         }
         .configurationDisplayName("Your App")
         .description("Shows your latest data at a glance.")
-        .supportedFamilies([.systemSmall, .systemMedium])
+        .supportedFamilies([.systemSmall.systemMedium])
     }
 }
 ```
 
 ---
 
-## Step 5 — Add the Extension to EAS Build
+## Step 5: Add the Extension to EAS Build
 
 In `eas.json`, add your widget target to the build profile:
 
@@ -244,12 +244,12 @@ Then call it from JS after updating the App Group data.
 
 ## Sizing Reference
 
-| Family | Logical Size (points) |
-|---|---|
-| `.systemSmall` | 155 × 155 |
-| `.systemMedium` | 329 × 155 |
-| `.systemLarge` | 329 × 345 |
-| `.systemExtraLarge` (iPad only) | 692 × 345 |
+| Family                          | Logical Size (points) |
+| ------------------------------- | --------------------- |
+| `.systemSmall`                  | 155 × 155             |
+| `.systemMedium`                 | 329 × 155             |
+| `.systemLarge`                  | 329 × 345             |
+| `.systemExtraLarge` (iPad only) | 692 × 345             |
 
 ---
 
@@ -257,5 +257,5 @@ Then call it from JS after updating the App Group data.
 
 - [WidgetKit documentation](https://developer.apple.com/documentation/widgetkit)
 - [App Groups entitlement](https://developer.apple.com/documentation/bundleresources/entitlements/com_apple_security_application-groups)
-- [Expo Modules Core](https://docs.expo.dev/modules/overview/) — for writing custom native modules
+- [Expo Modules Core](https://docs.expo.dev/modules/overview/), for writing custom native modules
 - [react-native-shared-group-preferences](https://github.com/KjellConnelly/react-native-shared-group-preferences)

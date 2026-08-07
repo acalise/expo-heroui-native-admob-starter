@@ -1,260 +1,154 @@
 /**
- * app/(tabs)/profile.tsx — Profile Screen Example
+ * app/(tabs)/profile.tsx: a realistic screen, not a component dump.
  *
- * A polished example of a real-world profile layout using HeroUI Native
- * components. Not app-specific — purely a layout and component demo.
+ * The showcase tab proves each component works in isolation. This one shows
+ * them composed into the kind of layout you'd actually ship: a header block,
+ * a stat row, a gated feature, and a list. Copy the structure, replace the data.
+ *
+ * It also demonstrates the pattern you'll use most in a freemium app,
+ * `useSubscription()` to gate a section, with a paywall route as the fallback.
  */
 
-import { ScrollView, View, Text, StyleSheet } from 'react-native';
-import {
-  Avatar,
-  Button,
-  Card,
-  Chip,
-  Separator,
-} from 'heroui-native';
-import { useTheme } from '@/context/ThemeContext';
-import { haptics } from '@/lib/haptics';
+import { Pressable, ScrollView, View } from 'react-native';
+import { useRouter } from 'expo-router';
+import { Avatar, Button, Card, Chip, Separator, Surface } from 'heroui-native';
+
+import { AppText } from '@/components/AppText';
+import { ChevronRightIcon, SparkleIcon } from '@/components/Icons';
 import { ScreenHeader } from '@/components/ScreenHeader';
-import { ACCENT_COLOR } from '@/constants/theme';
+import { SectionLabel } from '@/components/SectionLabel';
+import { haptics } from '@/lib/haptics';
+import { useSubscription } from '@/lib/subscription';
 
 const STATS = [
-  { label: 'Posts', value: '128' },
-  { label: 'Followers', value: '4.2k' },
-  { label: 'Following', value: '312' },
+  { label: 'Sessions', value: '128' },
+  { label: 'Day streak', value: '14' },
+  { label: 'Saved', value: '312' },
 ];
 
-const SKILLS = ['Design', 'TypeScript', 'React Native', 'Figma', 'GraphQL'];
+const TAGS = ['Design', 'TypeScript', 'React Native', 'Figma'];
 
-const ACHIEVEMENTS = [
-  { label: 'Early Adopter', emoji: '🚀', color: '#f59e0b' },
-  { label: 'Top Contributor', emoji: '⭐', color: '#3b82f6' },
-  { label: 'Bug Hunter', emoji: '🐛', color: '#10b981' },
+const ACTIVITY = [
+  { title: 'Completed a session', detail: '2 hours ago' },
+  { title: 'Hit a 14-day streak', detail: 'Yesterday' },
+  { title: 'Updated preferences', detail: '3 days ago' },
 ];
 
 export default function ProfileScreen() {
-  const { theme } = useTheme();
-  const s = styles(theme);
+  const router = useRouter();
+  const { isPro } = useSubscription();
 
   return (
     <ScrollView
-      style={s.scroll}
-      contentContainerStyle={s.content}
+      className="flex-1 bg-background"
+      contentContainerClassName="px-4 pb-10"
       showsVerticalScrollIndicator={false}
     >
-      <ScreenHeader title="Profile" subtitle="Example profile layout" />
+      <ScreenHeader title="Profile" subtitle="An example of a composed layout" />
 
-      {/* ── Hero Card ────────────────────────────────────────────────────── */}
-      <Card style={s.heroCard}>
-        <Card.Body style={s.heroBody}>
-          <View>
-            <Avatar alt="Alex Rivera" size="lg">
-              <Avatar.Image source={{ uri: 'https://i.pravatar.cc/150?u=a042581f4e29026704d' }} />
-              <Avatar.Fallback>AR</Avatar.Fallback>
-            </Avatar>
-            <View style={s.proBadge}>
-              <Text style={s.proBadgeText}>Pro</Text>
+      {/* ── Identity ────────────────────────────────────────────────────── */}
+      <Card>
+        <Card.Body className="items-center gap-3 py-6">
+          <Avatar alt="Alex Rivera" size="lg">
+            <Avatar.Image source={{ uri: 'https://i.pravatar.cc/150?u=heroui-starter' }} />
+            <Avatar.Fallback>AR</Avatar.Fallback>
+          </Avatar>
+
+          <View className="items-center gap-1">
+            <View className="flex-row items-center gap-2">
+              <AppText className="text-xl font-bold text-foreground">Alex Rivera</AppText>
+              {isPro && (
+                <Chip size="sm">
+                  <Chip.Label>Pro</Chip.Label>
+                </Chip>
+              )}
             </View>
+            <AppText className="text-sm text-muted">alex@example.com</AppText>
           </View>
 
-          <Text style={s.name}>Alex Rivera</Text>
-          <Text style={s.handle}>@alex_rivera · San Francisco, CA</Text>
-          <Text style={s.bio}>
-            Product designer & open-source enthusiast. Building things that
-            matter with great teams.
-          </Text>
-
-          <View style={s.statsRow}>
-            {STATS.map((stat, i) => (
-              <View key={stat.label} style={s.stat}>
-                <Text style={s.statValue}>{stat.value}</Text>
-                <Text style={s.statLabel}>{stat.label}</Text>
-                {i < STATS.length - 1 && (
-                  <View style={s.statDivider} />
-                )}
-              </View>
-            ))}
-          </View>
-
-          <View style={s.buttonRow}>
-            <Button
-              variant="primary"
-              style={{ flex: 1 }}
-              onPress={() => haptics.medium()}
-            >
-              Follow
-            </Button>
-            <Button
-              variant="outline"
-              style={{ flex: 1 }}
-              onPress={() => haptics.light()}
-            >
-              Message
-            </Button>
-          </View>
-        </Card.Body>
-      </Card>
-
-      {/* ── Skills ───────────────────────────────────────────────────────── */}
-      <Text style={s.sectionTitle}>Skills</Text>
-      <Card style={s.card}>
-        <Card.Body>
-          <View style={s.chipRow}>
-            {SKILLS.map((skill) => (
-              <Chip key={skill} variant="soft">
-                {skill}
+          <View className="flex-row flex-wrap justify-center gap-2 pt-1">
+            {TAGS.map((tag) => (
+              <Chip key={tag} size="sm" variant="tertiary">
+                <Chip.Label>{tag}</Chip.Label>
               </Chip>
             ))}
           </View>
         </Card.Body>
       </Card>
 
-      {/* ── Achievements ─────────────────────────────────────────────────── */}
-      <Text style={s.sectionTitle}>Achievements</Text>
-      <Card style={s.card}>
-        <Card.Body style={{ gap: 12 }}>
-          {ACHIEVEMENTS.map((item) => (
-            <View key={item.label} style={s.achievementRow}>
-              <View
-                style={[
-                  s.achievementIcon,
-                  { backgroundColor: `${item.color}22` },
-                ]}
-              >
-                <Text style={s.achievementEmoji}>{item.emoji}</Text>
-              </View>
-              <View style={{ flex: 1, marginLeft: 12 }}>
-                <Text style={s.achievementLabel}>{item.label}</Text>
-                <Text style={s.achievementDesc}>
-                  Earned for outstanding contributions
-                </Text>
-              </View>
-            </View>
-          ))}
-        </Card.Body>
-      </Card>
+      {/* ── Stats ───────────────────────────────────────────────────────── */}
+      <View className="flex-row gap-3 pt-3">
+        {STATS.map((stat) => (
+          <Surface key={stat.label} variant="secondary" className="flex-1 items-center gap-1 p-4">
+            <AppText className="text-2xl font-bold text-foreground">{stat.value}</AppText>
+            <AppText className="text-xs text-muted">{stat.label}</AppText>
+          </Surface>
+        ))}
+      </View>
 
-      {/* ── Activity ─────────────────────────────────────────────────────── */}
-      <Text style={s.sectionTitle}>Activity</Text>
-      <Card style={[s.card, { marginBottom: 32 }]}>
-        <Card.Body style={{ gap: 14 }}>
-          {[
-            { label: 'Profile Completion', value: 85 },
-            { label: 'Contributions', value: 62 },
-            { label: 'Engagement', value: 91 },
-          ].map((item) => (
-            <View key={item.label}>
-              <View style={s.progressHeader}>
-                <Text style={s.progressLabel}>{item.label}</Text>
-                <Text style={s.progressValue}>{item.value}%</Text>
-              </View>
-              <View style={s.progressTrack}>
-                <View
-                  style={[
-                    s.progressFill,
-                    { width: `${item.value}%`, backgroundColor: theme.accent },
-                  ]}
-                />
-              </View>
+      {/* ── A gated feature ─────────────────────────────────────────────── */}
+      <SectionLabel>Insights</SectionLabel>
+      {isPro ? (
+        <Card>
+          <Card.Body className="gap-2">
+            <View className="flex-row items-center gap-2">
+              <SparkleIcon className="text-accent" size={18} />
+              <AppText className="text-base font-semibold text-foreground">
+                Your week at a glance
+              </AppText>
+            </View>
+            <AppText className="text-sm leading-5 text-muted">
+              This block is what a subscriber sees. Gate real features the same way: read `isPro`
+              and branch, never check a product identifier.
+            </AppText>
+          </Card.Body>
+        </Card>
+      ) : (
+        /* The upsell a free user sees. Show the feature's *shape*, not a wall,
+           people convert on something they can already picture using. */
+        <Card>
+          <Card.Body className="gap-3">
+            <View className="flex-row items-center gap-2">
+              <SparkleIcon className="text-muted" size={18} />
+              <AppText className="text-base font-semibold text-foreground">Weekly insights</AppText>
+            </View>
+            <AppText className="text-sm leading-5 text-muted">
+              See patterns across your sessions, week over week. Available on Pro.
+            </AppText>
+            <Button
+              size="sm"
+              onPress={() => {
+                haptics.medium();
+                router.push('/paywall');
+              }}
+            >
+              <Button.Label>Unlock insights</Button.Label>
+            </Button>
+          </Card.Body>
+        </Card>
+      )}
+
+      {/* ── Activity ────────────────────────────────────────────────────── */}
+      <SectionLabel>Recent activity</SectionLabel>
+      <Card>
+        <Card.Body className="gap-0 py-1">
+          {ACTIVITY.map((item, index) => (
+            <View key={item.title}>
+              <Pressable
+                onPress={() => haptics.light()}
+                className="flex-row items-center gap-3 py-3"
+              >
+                <View className="flex-1">
+                  <AppText className="text-base text-foreground">{item.title}</AppText>
+                  <AppText className="text-sm text-muted">{item.detail}</AppText>
+                </View>
+                <ChevronRightIcon className="text-muted" size={18} />
+              </Pressable>
+              {index < ACTIVITY.length - 1 && <Separator />}
             </View>
           ))}
         </Card.Body>
       </Card>
     </ScrollView>
   );
-}
-
-function styles(theme: ReturnType<typeof useTheme>['theme']) {
-  return StyleSheet.create({
-    scroll: { flex: 1, backgroundColor: theme.background },
-    content: { paddingHorizontal: 16, paddingBottom: 40 },
-
-    heroCard: {
-      backgroundColor: theme.backgroundElevated,
-      borderRadius: 20,
-      marginBottom: 16,
-      borderColor: theme.border,
-    },
-    heroBody: { alignItems: 'center', paddingVertical: 24, gap: 8 },
-    name: { fontSize: 22, fontWeight: '700', color: theme.textPrimary, marginTop: 8 },
-    handle: { fontSize: 13, color: theme.textSecondary },
-    bio: {
-      fontSize: 14,
-      color: theme.textSecondary,
-      textAlign: 'center',
-      lineHeight: 20,
-      paddingHorizontal: 16,
-    },
-    proBadge: {
-      position: 'absolute',
-      bottom: -2,
-      right: -2,
-      backgroundColor: theme.accent,
-      borderRadius: 8,
-      paddingHorizontal: 6,
-      paddingVertical: 2,
-    },
-    proBadgeText: {
-      fontSize: 10,
-      fontWeight: '700',
-      color: '#ffffff',
-    },
-
-    statsRow: { flexDirection: 'row', marginTop: 8, gap: 24 },
-    stat: { alignItems: 'center', position: 'relative' },
-    statValue: { fontSize: 18, fontWeight: '700', color: theme.textPrimary },
-    statLabel: { fontSize: 12, color: theme.textSecondary, marginTop: 2 },
-    statDivider: {
-      position: 'absolute',
-      right: -12,
-      top: '10%',
-      height: '80%',
-      width: 1,
-      backgroundColor: theme.border,
-    },
-
-    buttonRow: { flexDirection: 'row', gap: 10, width: '100%', marginTop: 4 },
-
-    sectionTitle: {
-      fontSize: 16,
-      fontWeight: '700',
-      color: theme.textPrimary,
-      marginBottom: 10,
-      marginTop: 4,
-    },
-    card: {
-      backgroundColor: theme.backgroundElevated,
-      borderRadius: 16,
-      marginBottom: 16,
-      borderColor: theme.border,
-    },
-    chipRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-
-    achievementRow: { flexDirection: 'row', alignItems: 'center' },
-    achievementIcon: {
-      width: 44,
-      height: 44,
-      borderRadius: 12,
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
-    achievementEmoji: { fontSize: 22 },
-    achievementLabel: { fontSize: 14, fontWeight: '600', color: theme.textPrimary },
-    achievementDesc: { fontSize: 12, color: theme.textSecondary, marginTop: 2 },
-
-    progressHeader: { flexDirection: 'row', justifyContent: 'space-between' },
-    progressLabel: { fontSize: 13, fontWeight: '500', color: theme.textPrimary },
-    progressValue: { fontSize: 13, color: theme.textSecondary },
-    progressTrack: {
-      height: 8,
-      borderRadius: 4,
-      backgroundColor: theme.border,
-      overflow: 'hidden',
-      marginTop: 6,
-    },
-    progressFill: {
-      height: '100%',
-      borderRadius: 4,
-    },
-  });
 }

@@ -43,7 +43,7 @@ ExpoNotifications.setNotificationHandler({
 export interface DailyReminderOptions {
   title: string;
   body: string;
-  hour: number;   // 0-23
+  hour: number; // 0-23
   minute: number; // 0-59
   /** Optional data payload passed to notification handlers */
   data?: Record<string, unknown>;
@@ -148,7 +148,7 @@ export const notifications = {
 
   /**
    * Add a listener for received notifications (while app is foregrounded).
-   * Returns the subscription — call `.remove()` on it to clean up.
+   * Returns the subscription, call `.remove()` on it to clean up.
    */
   onReceived(
     handler: (notification: ExpoNotifications.Notification) => void,

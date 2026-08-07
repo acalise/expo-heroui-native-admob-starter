@@ -1,96 +1,97 @@
 /**
- * context/ThemeContext.tsx
+ * context/ThemeContext.tsx: light / dark / system, persisted.
  *
- * Provides:
- *   - colorMode: 'light' | 'dark'
- *   - toggleColorMode(): flip between light & dark
- *   - setColorMode(mode): set explicitly
- *   - theme: the full resolved token set (lightTheme / darkTheme)
- *   - isDark: boolean shorthand
+ * ── The one line that matters ───────────────────────────────────────────────
+ * `Uniwind.setTheme(...)`. HeroUI Native components are styled by CSS variables
+ * scoped to the `light` and `dark` variants, and Uniwind decides which variant
+ * is live. Track the color mode in React state alone and you get a toggle that
+ * flips your own screens while every Button, Card and Switch stays on the
+ * system setting: a genuinely confusing half-themed app. Uniwind must be told.
  *
- * Persists the user's preference in AsyncStorage so it survives restarts.
- * On first launch, falls back to the device's system color scheme.
+ * ── Three modes, not two ────────────────────────────────────────────────────
+ * 'system' is a distinct, persisted choice, not just the initial value. A user
+ * who never touches the toggle should keep following their device as it changes
+ * at sunset, and a user who picks Dark should stay dark at noon. Collapsing
+ * this to a boolean loses the difference and is the usual reason an app's dark
+ * mode "randomly turns itself back on".
  */
 
-import React, {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useState,
-} from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { useColorScheme } from 'react-native';
+import { Uniwind } from 'uniwind';
+
 import { storage } from '@/lib/storage';
-import {
-  lightTheme,
-  darkTheme,
-  type AppTheme,
-  type ColorMode,
-} from '@/constants/theme';
 
-// ── Storage key ───────────────────────────────────────────────────────────────
-const COLOR_MODE_KEY = 'user:colorMode';
+export type ColorModePreference = 'light' | 'dark' | 'system';
+export type ResolvedColorMode = 'light' | 'dark';
 
-// ── Context shape ─────────────────────────────────────────────────────────────
+const STORAGE_KEY = 'settings:colorMode';
+
 interface ThemeContextValue {
-  colorMode: ColorMode;
+  /** What the user chose, including 'system'. */
+  preference: ColorModePreference;
+  /** What that resolves to right now. */
+  colorMode: ResolvedColorMode;
   isDark: boolean;
-  theme: AppTheme;
+  setPreference: (mode: ColorModePreference) => void;
+  /** Convenience for a single switch: flips between explicit light and dark. */
   toggleColorMode: () => void;
-  setColorMode: (mode: ColorMode) => void;
 }
 
 const ThemeContext = createContext<ThemeContextValue | null>(null);
 
-// ── Provider ──────────────────────────────────────────────────────────────────
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const systemScheme = useColorScheme();
-  const [colorMode, setColorModeState] = useState<ColorMode>(
-    systemScheme === 'dark' ? 'dark' : 'light',
-  );
+  const [preference, setPreferenceState] = useState<ColorModePreference>('system');
   const [isLoaded, setIsLoaded] = useState(false);
 
-  // Load persisted preference on mount
+  // Restore the saved preference before the first paint.
   useEffect(() => {
     storage
-      .get<ColorMode>(COLOR_MODE_KEY)
+      .get<ColorModePreference>(STORAGE_KEY)
       .then((saved) => {
-        if (saved === 'light' || saved === 'dark') {
-          setColorModeState(saved);
+        if (saved === 'light' || saved === 'dark' || saved === 'system') {
+          setPreferenceState(saved);
+          Uniwind.setTheme(saved);
         }
       })
       .finally(() => setIsLoaded(true));
   }, []);
 
-  const setColorMode = useCallback((mode: ColorMode) => {
-    setColorModeState(mode);
-    storage.set(COLOR_MODE_KEY, mode);
+  const setPreference = useCallback((mode: ColorModePreference) => {
+    setPreferenceState(mode);
+    Uniwind.setTheme(mode); // ← see the header note
+    void storage.set(STORAGE_KEY, mode);
   }, []);
 
+  const colorMode: ResolvedColorMode =
+    preference === 'system' ? (systemScheme === 'dark' ? 'dark' : 'light') : preference;
+
   const toggleColorMode = useCallback(() => {
-    setColorMode(colorMode === 'dark' ? 'light' : 'dark');
-  }, [colorMode, setColorMode]);
+    setPreference(colorMode === 'dark' ? 'light' : 'dark');
+  }, [colorMode, setPreference]);
 
-  const isDark = colorMode === 'dark';
-  const theme = isDark ? darkTheme : lightTheme;
-
-  // Prevent flash of wrong theme before AsyncStorage loads
+  // Render nothing until the stored preference is known. One frame of a blank
+  // background beats one frame of the wrong theme, which reads as a flash.
   if (!isLoaded) return null;
 
   return (
     <ThemeContext.Provider
-      value={{ colorMode, isDark, theme, toggleColorMode, setColorMode }}
+      value={{
+        preference,
+        colorMode,
+        isDark: colorMode === 'dark',
+        setPreference,
+        toggleColorMode,
+      }}
     >
       {children}
     </ThemeContext.Provider>
   );
 }
 
-// ── Hook ──────────────────────────────────────────────────────────────────────
-export function useTheme(): ThemeContextValue {
+export function useColorMode(): ThemeContextValue {
   const ctx = useContext(ThemeContext);
-  if (!ctx) {
-    throw new Error('useTheme must be used within a <ThemeProvider>');
-  }
+  if (!ctx) throw new Error('useColorMode must be used inside <ThemeProvider>');
   return ctx;
 }

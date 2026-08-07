@@ -26,12 +26,12 @@ Open a [GitHub issue](https://github.com/acalise/expo-heroui-native-admob-starte
    - `feat: add bottom sheet support`
    - `fix: dark mode flash on launch`
    - `docs: update AdMob setup instructions`
-5. **Keep PRs focused** — one feature or fix per PR
+5. **Keep PRs focused**: one feature or fix per PR
 6. **Open a Pull Request** against `main` with a clear description of what changed and why
 
 ## Code Style
 
-- **TypeScript** with strict mode — no `any` types unless absolutely necessary
+- **TypeScript** with strict mode, no `any` types unless absolutely necessary
 - Follow existing patterns in the codebase for file structure and naming
 - Use `className` props and Tailwind utilities for styling (via Uniwind)
 - Run `npm run type-check` before submitting to catch type errors

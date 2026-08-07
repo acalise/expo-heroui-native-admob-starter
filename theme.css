@@ -1,0 +1,76 @@
+/* ─────────────────────────────────────────────────────────────────────────────
+   theme.css: THE one file you edit to retheme the whole app.
+   ─────────────────────────────────────────────────────────────────────────────
+
+   HeroUI Native is styled entirely with CSS custom properties. Every component
+   (Button, Card, Switch, Select, Toast…) reads `--accent`, `--background`,
+   `--surface`, `--foreground`, and friends. Override a variable here and every
+   component picks it up, no props to thread, no component forks.
+
+   The same variables are readable from JavaScript via `useAppTheme()`
+   (hooks/useAppTheme.ts), which is how the few non-className surfaces,
+   the tab bar tint, the status bar, native modal backgrounds, stay in sync.
+   That is why there is no `constants/theme.ts` full of duplicated hex codes:
+   one definition, both consumers.
+
+   ── Why hex and not oklch? ──────────────────────────────────────────────────
+   HeroUI's own defaults use `oklch()`, which is correct and perceptually nicer.
+   We use plain hex for the values `useAppTheme()` reads, because React Native's
+   style engine cannot parse `oklch()`: a raw oklch string handed to
+   `tabBarActiveTintColor` renders as transparent. Values only ever consumed
+   through `className` can safely be oklch.
+
+   ── The full variable list ──────────────────────────────────────────────────
+   See node_modules/heroui-native/lib/module/styles/variables.css for every
+   token HeroUI defines. Anything you don't override here keeps HeroUI's default.
+   ───────────────────────────────────────────────────────────────────────────── */
+
+@layer theme {
+  :root {
+    @variant light {
+      /* ── Change these two lines to rebrand the app ─────────────────────── */
+      --accent: #3b82f6; /* blue-500, primary buttons, active tab, focus rings */
+      --accent-foreground: #ffffff; /* text/icons drawn ON the accent color    */
+
+      /* Surfaces. Comment any of these out to fall back to HeroUI's defaults. */
+      --background: #ffffff;
+      --surface: #ffffff;
+      --surface-secondary: #f4f4f5;
+      --surface-tertiary: #e9e9ec;
+
+      --foreground: #09090b;
+      --muted: #71717a;
+      --border: #e4e4e7;
+      --separator: #e4e4e7;
+
+      /* Status colors, used by Alert, Chip, Toast and the danger Button. */
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+
+      /* Corner roundness for every component at once. */
+      --radius: 0.75rem;
+    }
+
+    @variant dark {
+      --accent: #3b82f6;
+      --accent-foreground: #ffffff;
+
+      --background: #0f0f0f;
+      --surface: #1c1c1e;
+      --surface-secondary: #232326;
+      --surface-tertiary: #2a2a2e;
+
+      --foreground: #fafafa;
+      --muted: #a1a1aa;
+      --border: #27272a;
+      --separator: #27272a;
+
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+
+      --radius: 0.75rem;
+    }
+  }
+}

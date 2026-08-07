@@ -1,411 +1,257 @@
 /**
- * app/(tabs)/index.tsx — Component Showcase
+ * app/(tabs)/index.tsx: HeroUI Native component showcase.
  *
- * This screen demonstrates the HeroUI Native components available in this
- * starter. Replace with your own content once you've picked what you need.
+ * A live reference for the components you'll reach for most, and the place to
+ * check what a variant looks like in both color schemes without leaving the
+ * app. Delete this screen once you know the library, nothing depends on it.
+ *
+ * Note the styling: `className`, not StyleSheet. The classes resolve against
+ * the CSS variables in theme.css, which is what makes both color schemes work
+ * with no conditional logic anywhere in this file.
  */
 
-import { ScrollView, View, Text, StyleSheet, ActivityIndicator } from 'react-native';
+import { useState } from 'react';
+import { ScrollView, View } from 'react-native';
 import {
+  Alert,
+  Avatar,
   Button,
   Card,
-  Input,
-  Switch,
-  Avatar,
   Chip,
+  ControlField,
+  Description,
+  FieldError,
+  Input,
+  Label,
   Separator,
+  Skeleton,
   Spinner,
+  Surface,
+  TextField,
 } from 'heroui-native';
-import { useState } from 'react';
-import { useTheme } from '@/context/ThemeContext';
-import { haptics } from '@/lib/haptics';
+
+import { AppText } from '@/components/AppText';
+import { BannerAd } from '@/components/BannerAd';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import { SectionLabel } from '@/components/SectionLabel';
-import { BannerAd } from '@/components/BannerAd';
+import { haptics } from '@/lib/haptics';
 
 export default function ComponentsScreen() {
-  const { theme } = useTheme();
-  const [inputValue, setInputValue] = useState('');
-  const [switchOn, setSwitchOn] = useState(false);
-  const [progress, setProgress] = useState(60);
-  const [isLoading, setIsLoading] = useState(false);
+  const [email, setEmail] = useState('');
+  const [notifications, setNotifications] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  function handleLoadingButton() {
+  function simulateWork() {
     haptics.medium();
-    setIsLoading(true);
-    setTimeout(() => setIsLoading(false), 2000);
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+      haptics.success();
+    }, 1600);
   }
-
-  const s = styles(theme);
 
   return (
     <ScrollView
-      style={s.scroll}
-      contentContainerStyle={s.content}
+      className="flex-1 bg-background"
+      contentContainerClassName="px-4 pb-10"
       showsVerticalScrollIndicator={false}
     >
-      <ScreenHeader
-        title="Components"
-        subtitle="HeroUI Native component showcase"
-      />
+      <ScreenHeader title="Components" subtitle="HeroUI Native, themed by theme.css" />
 
-      {/* ── Buttons ──────────────────────────────────────────────────────── */}
+      {/* ── Buttons ─────────────────────────────────────────────────────── */}
       <SectionLabel>Buttons</SectionLabel>
-
-      <Card style={s.card}>
-        <Card.Body style={s.cardBody}>
-          <View style={s.row}>
-            <Button
-              variant="primary"
-              onPress={() => haptics.medium()}
-              style={s.btnFlex}
-            >
-              Primary
+      <Card>
+        <Card.Body className="gap-3">
+          <View className="flex-row gap-2">
+            <Button className="flex-1" onPress={() => haptics.medium()}>
+              <Button.Label>Primary</Button.Label>
             </Button>
-            <Button
-              variant="secondary"
-              onPress={() => haptics.light()}
-              style={s.btnFlex}
-            >
-              Secondary
+            <Button variant="secondary" className="flex-1" onPress={() => haptics.light()}>
+              <Button.Label>Secondary</Button.Label>
             </Button>
           </View>
-
-          <View style={s.row}>
-            <Button
-              variant="outline"
-              onPress={() => haptics.light()}
-              style={s.btnFlex}
-            >
-              Outline
+          <View className="flex-row gap-2">
+            <Button variant="tertiary" className="flex-1" onPress={() => haptics.light()}>
+              <Button.Label>Tertiary</Button.Label>
             </Button>
-            <Button
-              variant="ghost"
-              onPress={() => haptics.light()}
-              style={s.btnFlex}
-            >
-              Ghost
+            <Button variant="ghost" className="flex-1" onPress={() => haptics.light()}>
+              <Button.Label>Ghost</Button.Label>
             </Button>
           </View>
-
-          <View style={s.row}>
-            <Button
-              variant="primary"
-              size="sm"
-              onPress={() => haptics.success()}
-            >
-              Small
+          <View className="flex-row gap-2">
+            <Button size="sm" onPress={() => haptics.light()}>
+              <Button.Label>Small</Button.Label>
             </Button>
-            <Button
-              variant="secondary"
-              size="sm"
-              onPress={() => haptics.warning()}
-            >
-              Small
+            <Button size="sm" variant="danger" onPress={() => haptics.error()}>
+              <Button.Label>Danger</Button.Label>
             </Button>
-            <Button
-              variant="danger"
-              size="sm"
-              onPress={() => haptics.error()}
-            >
-              Danger
+            <Button size="sm" variant="ghost" isDisabled>
+              <Button.Label>Disabled</Button.Label>
             </Button>
           </View>
-
-          <Button
-            variant="primary"
-            isDisabled={isLoading}
-            onPress={handleLoadingButton}
-          >
-            {isLoading ? 'Loading…' : 'Press to Load'}
+          <Button isDisabled={loading} onPress={simulateWork}>
+            <Button.Label>{loading ? 'Working…' : 'Press to load'}</Button.Label>
           </Button>
         </Card.Body>
       </Card>
 
-      {/* ── Inputs ───────────────────────────────────────────────────────── */}
-      <SectionLabel>Inputs</SectionLabel>
-
-      <Card style={s.card}>
-        <Card.Body style={s.cardBody}>
-          <View>
-            <Text style={s.inputLabel}>Username</Text>
-            <Input
-              placeholder="Enter your username"
-              value={inputValue}
-              onChangeText={setInputValue}
-            />
-          </View>
-          <View>
-            <Text style={s.inputLabel}>Password</Text>
-            <Input
-              placeholder="Enter your password"
-              secureTextEntry
-            />
-          </View>
-          <View>
-            <Text style={s.inputLabel}>Email</Text>
+      {/* ── Form fields ─────────────────────────────────────────────────── */}
+      <SectionLabel>Form fields</SectionLabel>
+      <Card>
+        <Card.Body className="gap-4">
+          <TextField isRequired>
+            <Label>Email</Label>
             <Input
               placeholder="you@example.com"
+              value={email}
+              onChangeText={setEmail}
               keyboardType="email-address"
               autoCapitalize="none"
             />
-            <Text style={s.inputDesc}>We'll never share your email.</Text>
-          </View>
-          <View>
-            <Text style={s.inputLabel}>Error state</Text>
-            <Input
-              placeholder="Something went wrong"
-              isInvalid
-            />
-            <Text style={s.inputError}>This field is required.</Text>
-          </View>
+            <Description>We&apos;ll never share this.</Description>
+          </TextField>
+
+          <TextField isInvalid={email.length > 0 && !email.includes('@')}>
+            <Label>Validated field</Label>
+            <Input placeholder="Type without an @ to see the error state" />
+            <FieldError>That doesn&apos;t look like an email.</FieldError>
+          </TextField>
+
+          <ControlField isSelected={notifications} onSelectedChange={setNotifications}>
+            <View className="flex-1">
+              <Label>
+                <Label.Text>Notifications</Label.Text>
+              </Label>
+              <Description>ControlField wires the whole row to the switch.</Description>
+            </View>
+            {/* Indicator renders the Switch and wires it to the field, so the
+                whole row is tappable, not just the 50pt switch itself. */}
+            <ControlField.Indicator />
+          </ControlField>
         </Card.Body>
       </Card>
 
-      {/* ── Cards ────────────────────────────────────────────────────────── */}
-      <SectionLabel>Cards</SectionLabel>
+      {/* ── Feedback ────────────────────────────────────────────────────── */}
+      <SectionLabel>Feedback</SectionLabel>
+      <View className="gap-3">
+        <Alert status="accent">
+          <Alert.Indicator />
+          <Alert.Content>
+            <Alert.Title>Heads up</Alert.Title>
+            <Alert.Description>
+              Alerts come in accent, success, warning and danger.
+            </Alert.Description>
+          </Alert.Content>
+        </Alert>
+        <Alert status="danger">
+          <Alert.Indicator />
+          <Alert.Content>
+            <Alert.Title>Something went wrong</Alert.Title>
+            <Alert.Description>Colors come from --danger in theme.css.</Alert.Description>
+          </Alert.Content>
+        </Alert>
+      </View>
 
-      <Card style={s.card}>
+      {/* ── Surfaces & cards ────────────────────────────────────────────── */}
+      <SectionLabel>Surfaces</SectionLabel>
+      <Card>
         <Card.Header>
-          <Text style={s.cardTitle}>Featured</Text>
+          <Card.Title>Card</Card.Title>
         </Card.Header>
         <Card.Body>
-          <Text style={s.cardText}>
-            Cards are flexible containers that group related content. Use
-            variants like <Text style={s.accent}>secondary</Text>,{' '}
-            <Text style={s.accent}>tertiary</Text>, or the default style.
-          </Text>
+          <Card.Description>
+            Cards group related content. Surfaces are the same idea without the slots, use whichever
+            reads better.
+          </Card.Description>
         </Card.Body>
+        <Card.Footer className="flex-row gap-2">
+          <Button size="sm" variant="ghost">
+            <Button.Label>Dismiss</Button.Label>
+          </Button>
+          <Button size="sm">
+            <Button.Label>Confirm</Button.Label>
+          </Button>
+        </Card.Footer>
       </Card>
 
-      <Card variant="secondary" style={s.card}>
-        <Card.Body style={s.cardBody}>
-          <View style={s.row}>
-            <Avatar alt="Alice">
+      <View className="flex-row gap-3 pt-3">
+        <Surface className="flex-1 gap-1 p-4">
+          <AppText className="text-sm font-semibold text-foreground">Default</AppText>
+          <AppText className="text-xs text-muted">--surface</AppText>
+        </Surface>
+        <Surface variant="secondary" className="flex-1 gap-1 p-4">
+          <AppText className="text-sm font-semibold text-foreground">Secondary</AppText>
+          <AppText className="text-xs text-muted">--surface-secondary</AppText>
+        </Surface>
+      </View>
+
+      {/* ── People & tags ───────────────────────────────────────────────── */}
+      <SectionLabel>People &amp; tags</SectionLabel>
+      <Card>
+        <Card.Body className="gap-4">
+          <View className="flex-row items-center gap-3">
+            <Avatar alt="Alice Johnson">
               <Avatar.Fallback>AJ</Avatar.Fallback>
             </Avatar>
-            <View style={{ flex: 1, marginLeft: 12 }}>
-              <Text style={s.cardTitle}>Alice Johnson</Text>
-              <Text style={s.cardSubtitle}>Product Designer</Text>
+            <View className="flex-1">
+              <AppText className="text-base font-semibold text-foreground">Alice Johnson</AppText>
+              <AppText className="text-sm text-muted">Product Designer</AppText>
             </View>
-            <Chip variant="primary" size="sm">New</Chip>
-          </View>
-        </Card.Body>
-      </Card>
-
-      {/* ── Switch ───────────────────────────────────────────────────────── */}
-      <SectionLabel>Switches</SectionLabel>
-
-      <Card style={s.card}>
-        <Card.Body style={s.cardBody}>
-          <View style={s.switchRow}>
-            <View style={{ flex: 1 }}>
-              <Text style={s.cardTitle}>Notifications</Text>
-              <Text style={s.cardSubtitle}>Receive push notifications</Text>
-            </View>
-            <Switch
-              isSelected={switchOn}
-              onSelectedChange={(v: boolean) => {
-                haptics.light();
-                setSwitchOn(v);
-              }}
-            />
+            <Chip size="sm">
+              <Chip.Label>New</Chip.Label>
+            </Chip>
           </View>
 
           <Separator />
 
-          <View style={s.switchRow}>
-            <View style={{ flex: 1 }}>
-              <Text style={s.cardTitle}>Dark Mode</Text>
-              <Text style={s.cardSubtitle}>Toggle in Settings tab</Text>
-            </View>
-            <Switch isSelected={false} isDisabled />
-          </View>
-        </Card.Body>
-      </Card>
-
-      {/* ── Progress (custom) ──────────────────────────────────────────── */}
-      <SectionLabel>Progress</SectionLabel>
-
-      <Card style={s.card}>
-        <Card.Body style={s.cardBody}>
-          <Text style={s.cardSubtitle}>Default ({progress}%)</Text>
-          <View style={s.progressTrack}>
-            <View style={[s.progressFill, { width: `${progress}%`, backgroundColor: theme.accent }]} />
+          <View className="flex-row flex-wrap items-center gap-2">
+            <Chip>
+              <Chip.Label>Default</Chip.Label>
+            </Chip>
+            <Chip variant="secondary">
+              <Chip.Label>Secondary</Chip.Label>
+            </Chip>
+            <Chip variant="tertiary">
+              <Chip.Label>Tertiary</Chip.Label>
+            </Chip>
           </View>
 
-          <Text style={[s.cardSubtitle, { marginTop: 12 }]}>Success (100%)</Text>
-          <View style={s.progressTrack}>
-            <View style={[s.progressFill, { width: '100%', backgroundColor: '#10b981' }]} />
-          </View>
-
-          <Text style={[s.cardSubtitle, { marginTop: 12 }]}>Warning (40%)</Text>
-          <View style={s.progressTrack}>
-            <View style={[s.progressFill, { width: '40%', backgroundColor: '#f59e0b' }]} />
-          </View>
-
-          <View style={[s.row, { marginTop: 16 }]}>
-            <Button
-              size="sm"
-              variant="outline"
-              onPress={() => {
-                haptics.light();
-                setProgress((p) => Math.max(0, p - 10));
-              }}
-            >
-              −10
-            </Button>
-            <Button
-              size="sm"
-              variant="outline"
-              onPress={() => {
-                haptics.light();
-                setProgress((p) => Math.min(100, p + 10));
-              }}
-            >
-              +10
-            </Button>
-          </View>
-        </Card.Body>
-      </Card>
-
-      {/* ── Chips ──────────────────────────────────────────────────────── */}
-      <SectionLabel>Chips</SectionLabel>
-
-      <Card style={s.card}>
-        <Card.Body style={s.cardBody}>
-          <View style={s.chipRow}>
-            <Chip variant="primary">Primary</Chip>
-            <Chip variant="secondary">Secondary</Chip>
-            <Chip variant="tertiary">Tertiary</Chip>
-            <Chip variant="soft">Soft</Chip>
-          </View>
-        </Card.Body>
-      </Card>
-
-      {/* ── Avatars ──────────────────────────────────────────────────────── */}
-      <SectionLabel>Avatars</SectionLabel>
-
-      <Card style={s.card}>
-        <Card.Body style={s.cardBody}>
-          <View style={s.chipRow}>
-            <Avatar alt="Alice" size="sm">
-              <Avatar.Fallback>AL</Avatar.Fallback>
+          <View className="flex-row items-center gap-3">
+            <Avatar alt="Small" size="sm">
+              <Avatar.Fallback>SM</Avatar.Fallback>
             </Avatar>
-            <Avatar alt="Bob" size="md">
-              <Avatar.Fallback>BO</Avatar.Fallback>
+            <Avatar alt="Medium" size="md">
+              <Avatar.Fallback>MD</Avatar.Fallback>
             </Avatar>
-            <Avatar alt="Charlie" size="lg">
-              <Avatar.Fallback>CH</Avatar.Fallback>
-            </Avatar>
-            <Avatar alt="Photo" size="lg">
-              <Avatar.Image source={{ uri: 'https://i.pravatar.cc/150?u=a042581f4e29026704d' }} />
-              <Avatar.Fallback>PH</Avatar.Fallback>
-            </Avatar>
-          </View>
-          <View style={[s.chipRow, { marginTop: 12 }]}>
-            <Avatar alt="XL" size="lg">
-              <Avatar.Fallback>XL</Avatar.Fallback>
-            </Avatar>
-            <Avatar alt="Bordered" size="lg">
-              <Avatar.Fallback>BD</Avatar.Fallback>
-            </Avatar>
-            <Avatar alt="Disabled" size="lg">
-              <Avatar.Fallback>DI</Avatar.Fallback>
+            <Avatar alt="Large" size="lg">
+              <Avatar.Fallback>LG</Avatar.Fallback>
             </Avatar>
           </View>
         </Card.Body>
       </Card>
 
-      {/* ── Spinner ──────────────────────────────────────────────────────── */}
-      <SectionLabel>Spinners</SectionLabel>
-
-      <Card style={[s.card, { marginBottom: 32 }]}>
-        <Card.Body style={s.cardBody}>
-          <View style={s.chipRow}>
+      {/* ── Loading ─────────────────────────────────────────────────────── */}
+      <SectionLabel>Loading</SectionLabel>
+      <Card>
+        <Card.Body className="gap-4">
+          <View className="flex-row items-center gap-4">
             <Spinner size="sm" />
             <Spinner size="md" />
             <Spinner size="lg" />
           </View>
+          <Separator />
+          {/* Skeletons beat spinners for content that has a known shape: the
+              layout doesn't jump when the real data lands. */}
+          <View className="gap-2">
+            <Skeleton className="h-4 w-2/3 rounded-md" />
+            <Skeleton className="h-4 w-full rounded-md" />
+            <Skeleton className="h-4 w-1/2 rounded-md" />
+          </View>
         </Card.Body>
       </Card>
 
-      {/* Optional: Banner ad at the bottom of the screen */}
-      <BannerAd marginVertical={12} />
+      {/* Collapses to nothing when ads are off or the user subscribes. */}
+      <BannerAd />
     </ScrollView>
   );
-}
-
-// ── Styles ────────────────────────────────────────────────────────────────────
-function styles(theme: ReturnType<typeof useTheme>['theme']) {
-  return StyleSheet.create({
-    scroll: { flex: 1, backgroundColor: theme.background },
-    content: { paddingHorizontal: 16, paddingBottom: 40 },
-    card: {
-      backgroundColor: theme.backgroundElevated,
-      marginBottom: 12,
-      borderRadius: 16,
-      borderColor: theme.border,
-    },
-    cardBody: { gap: 10 },
-    cardTitle: {
-      fontSize: 15,
-      fontWeight: '600',
-      color: theme.textPrimary,
-    },
-    cardSubtitle: {
-      fontSize: 13,
-      color: theme.textSecondary,
-      marginBottom: 4,
-    },
-    cardText: {
-      fontSize: 14,
-      color: theme.textSecondary,
-      lineHeight: 21,
-    },
-    accent: { color: theme.accent, fontWeight: '600' },
-    row: {
-      flexDirection: 'row',
-      gap: 8,
-      alignItems: 'center',
-    },
-    btnFlex: { flex: 1 },
-    switchRow: {
-      flexDirection: 'row',
-      alignItems: 'center',
-    },
-    chipRow: {
-      flexDirection: 'row',
-      flexWrap: 'wrap',
-      gap: 8,
-      alignItems: 'center',
-    },
-    inputLabel: {
-      fontSize: 13,
-      fontWeight: '500',
-      color: theme.textPrimary,
-      marginBottom: 4,
-    },
-    inputDesc: {
-      fontSize: 12,
-      color: theme.textSecondary,
-      marginTop: 4,
-    },
-    inputError: {
-      fontSize: 12,
-      color: '#ef4444',
-      marginTop: 4,
-    },
-    progressTrack: {
-      height: 8,
-      borderRadius: 4,
-      backgroundColor: theme.border,
-      overflow: 'hidden',
-      marginTop: 4,
-    },
-    progressFill: {
-      height: '100%',
-      borderRadius: 4,
-    },
-  });
 }

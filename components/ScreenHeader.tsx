@@ -1,37 +1,38 @@
 /**
- * components/ScreenHeader.tsx
+ * components/ScreenHeader.tsx: the large title at the top of a tab screen.
  *
- * Consistent in-screen header used across all tab screens.
- * Renders above the scrollable content area (not a navigation header).
+ * Deliberately not a navigation header: it scrolls away with the content, which
+ * is the iOS large-title behaviour people expect, and it lets each screen own
+ * its own spacing without fighting the navigator.
  */
 
-import { View, Text, StyleSheet } from 'react-native';
+import { View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useTheme } from '@/context/ThemeContext';
+
+import { AppText } from './AppText';
 
 interface ScreenHeaderProps {
   title: string;
   subtitle?: string;
+  /** Rendered on the right: an action button, a chip, a count. */
+  accessory?: React.ReactNode;
 }
 
-export function ScreenHeader({ title, subtitle }: ScreenHeaderProps) {
-  const { theme } = useTheme();
+export function ScreenHeader({ title, subtitle, accessory }: ScreenHeaderProps) {
   const insets = useSafeAreaInsets();
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top + 16 }]}>
-      <Text style={[styles.title, { color: theme.textPrimary }]}>{title}</Text>
-      {subtitle && (
-        <Text style={[styles.subtitle, { color: theme.textSecondary }]}>
-          {subtitle}
-        </Text>
-      )}
+    <View
+      className="flex-row items-end justify-between pb-5"
+      style={{ paddingTop: insets.top + 16 }}
+    >
+      <View className="flex-1">
+        <AppText className="text-[32px] font-extrabold tracking-tight text-foreground">
+          {title}
+        </AppText>
+        {subtitle ? <AppText className="pt-1 text-sm text-muted">{subtitle}</AppText> : null}
+      </View>
+      {accessory}
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: { paddingBottom: 20 },
-  title: { fontSize: 32, fontWeight: '800', letterSpacing: -0.5 },
-  subtitle: { fontSize: 14, marginTop: 4 },
-});
