@@ -35,7 +35,7 @@ A Mobile Measurement Partner is the piece that reconstructs the link. AppsFlyer 
 3. ```bash
    # .env
    EXPO_PUBLIC_APPSFLYER_DEV_KEY=your_dev_key
-   EXPO_PUBLIC_APPLE_APP_ID=6760719879   # digits from your App Store URL
+   EXPO_PUBLIC_APPLE_APP_ID=1234567890   # digits from your App Store URL
    ```
 4. `npx expo prebuild --clean && npx expo run:ios`
 

@@ -29,7 +29,7 @@ import { Platform } from 'react-native';
 export const APP_NAME = process.env.EXPO_PUBLIC_APP_NAME || 'My App';
 
 /**
- * Numeric Apple App ID (the digits in every App Store URL: /id6760719879).
+ * Numeric Apple App ID (the digits in every App Store URL: /id1234567890).
  * Needed by AppsFlyer for SKAdNetwork attribution and by the rating prompt's
  * "write a review" deep link. Public information, safe to hardcode as a
  * fallback so a missing env var can't silently break attribution in a release.
