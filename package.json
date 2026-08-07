@@ -1,7 +1,7 @@
 {
   "name": "expo-heroui-starter",
   "version": "2.0.0",
-  "description": "Production-ready Expo starter: HeroUI Native, dark/light theming, onboarding, RevenueCat subscriptions, AppsFlyer attribution, PostHog analytics, and Google AdMob \u2014 every integration optional and no-op by default",
+  "description": "Production-ready Expo SDK 57 starter: HeroUI Native, dark/light theming, onboarding, RevenueCat subscriptions, AppsFlyer attribution, PostHog analytics, and Google AdMob. Every integration is optional and no-ops until you add a key.",
   "author": "acalise",
   "license": "MIT",
   "homepage": "https://github.com/acalise/expo-heroui-native-admob-starter",
